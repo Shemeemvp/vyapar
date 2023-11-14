@@ -107,7 +107,12 @@ def sale_invoices(request):
   return render(request, 'sale_invoices.html')
 
 def estimate_quotation(request):
-  return render(request, 'estimate_quotation.html')
+  com =  company.objects.get(user = request.user)
+  allmodules= modules_list.objects.get(company=com.id,status='New')
+  context = {
+    'company':com,'allmodules':allmodules
+  }
+  return render(request, 'company/estimate_quotation.html',context)
 
 def payment_in(request):
   return render(request, 'payment_in.html')
@@ -115,8 +120,13 @@ def payment_in(request):
 def sale_order(request):
   return render(request, 'sale_order.html')
 
-def delivery_chellan(request):
-  return render(request, 'delivery_chellan.html')
+def delivery_challan(request):
+  com =  company.objects.get(user = request.user)
+  allmodules= modules_list.objects.get(company=com.id,status='New')
+  context = {
+    'company':com,'allmodules':allmodules
+  }
+  return render(request, 'company/delivery_challan.html',context)
 
 def sale_return_cr(request):
   return render(request, 'sale_return_cr.html')
@@ -1178,3 +1188,127 @@ def adminhome(request):
 
 
 
+# ===========  estimate & delivery challan ===========shemeem==================
+
+def create_estimate(request):
+  try:
+    com =  company.objects.get(user = request.user)
+    allmodules= modules_list.objects.get(company=com.id,status='New')
+    parties = party.objects.filter(company = com)
+    items = ItemModel.objects.filter(company = com)
+
+    # Fetching last bill and assigning upcoming bill no as current + 1
+    # Also check for if any bill is deleted and bill no is continuos w r t the deleted bill
+    latest_bill = Estimate.objects.filter(company = com).order_by('-ref_no').first()
+
+    if latest_bill:
+        last_number = int(latest_bill.ref_no)
+        new_number = last_number + 1
+    else:
+        new_number = 1
+
+    if DeletedEstimate.objects.filter(company = com).exists():
+        deleted = DeletedEstimate.objects.get(company = com)
+        
+        if deleted:
+            while int(deleted.ref_no) >= new_number:
+                new_number+=1
+
+    
+    context = {
+      'company':com,'allmodules':allmodules, 'parties':parties, 'ref_no':new_number,'items':items,
+    }
+    return render(request, 'company/create_estimate.html',context)
+  except Exception as e:
+    print(e)
+    return redirect(estimate_quotation)
+
+
+def getPartyDetails(request):
+  com =  company.objects.get(user = request.user)
+  party_id = request.POST.get('id')
+  party_details = party.objects.get(id = party_id)
+
+  list = []
+  dict = {
+    'contact': party_details.contact,
+    'address':party_details.address,
+    'state': party_details.state,
+    'balance':party_details.openingbalance,
+    'payment':party_details.payment,
+  }
+  list.append(dict)
+  return JsonResponse(json.dumps(list), content_type="application/json", safe=False)
+    
+
+def getItemData(request):
+  try:
+      com =  company.objects.get(user = request.user)
+      id = request.GET.get('id')
+
+      item = ItemModel.objects.get(item_name = id, company = com)
+      hsn = item.item_hsn
+      pur_rate = item.item_purchase_price
+      sale_rate = item.item_sale_price
+      tax = True if item.item_taxable == "Taxable" else False
+      gst = item.item_gst
+      igst = item.item_igst
+
+      return JsonResponse({"status":True,'id':item.id,'hsn':hsn,'pur_rate':pur_rate,'sale_rate':sale_rate, 'tax':tax, 'gst':gst, 'igst':igst})
+  except Exception as e:
+      print(e)
+      return JsonResponse({"status":False})
+  
+
+def createNewEstimate(request):
+  if request.user:
+    try:
+        com = company.objects.get(user=request.user.id)
+        if request.method == 'POST':
+            estimate = Estimate(
+              company = com,
+              user = User.objects.get(id = request.user.id),
+              date = request.POST['date'],
+              ref_no = request.POST['ref_no'],
+              party_name = party.objects.get(id = request.POST['party_name']).party_name,
+              contact = request.POST['contact'],
+              billing_address = request.POST['address'],
+              state_of_supply = 'State' if request.POST['state_supply'] == 'state' else 'Other State',
+              description = request.POST['description'],
+              subtotal = request.POST['subtotal'],
+              cgst = request.POST['cgst_tax'],
+              sgst = request.POST['sgst_tax'],
+              igst = request.POST['igst_tax'],
+              tax_amount = request.POST['tax_amount'],
+              adjustment = request.POST['adjustment'],
+              total_amount = request.POST['grand_total'],
+            )
+            estimate.save()
+            
+            ids = request.POST.getlist('estItems[]')
+            item = request.POST.getlist("item[]")
+            hsn  = request.POST.getlist("hsn[]")
+            qty = request.POST.getlist("qty[]")
+            price = request.POST.getlist("price[]")
+            tax = request.POST.getlist("taxgst[]") if request.POST['state_supply'] == 'state' else request.POST.getlist("taxigst[]")
+            discount = request.POST.getlist("discount[]")
+            total = request.POST.getlist("total[]")
+
+            est_id = Estimate.objects.get( ref_no = estimate.ref_no)
+
+            if len(ids)==len(item)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and ids and item and hsn and qty and price and tax and discount and total:
+                mapped = zip(ids,item,hsn,qty,price,tax,discount,total)
+                mapped = list(mapped)
+                for ele in mapped:
+                  estItems = Estimate_items.objects.create(user = User.objects.get(id = request.user.id),eid = est_id, company = com, item = ItemModel.objects.get(company = com, id = ele[0]),name = ele[1],hsn=ele[2],quantity=ele[3],price=ele[4],tax=ele[5],discount = ele[6],total=ele[7])
+            
+
+            if 'save_and_next' in request.POST:
+                return redirect(create_estimate)
+            return redirect(estimate_quotation)
+    except Exception as e:
+        print(e)
+        return redirect(create_estimate)
+  return redirect('/')
+
+# ===================end ---shemeem =============================

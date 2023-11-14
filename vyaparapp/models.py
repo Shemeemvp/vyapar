@@ -139,3 +139,45 @@ class TransactionModel(models.Model):
     trans_created_date = models.DateTimeField(auto_now_add=True,null=True)
 
 # ========================= ASHIKH V U (END)===========================
+
+
+# ==============delivery challan & Estimate ============shemeem --start=======
+
+class Estimate(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
+    company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
+    ref_no = models.CharField(max_length=20, null=True)
+    date = models.DateField(null=True, blank=True)
+    party_name = models.CharField(max_length=150)
+    contact = models.CharField(max_length=255,null=True,blank=True)
+    billing_address = models.TextField()
+    state_of_supply = models.CharField(max_length=200, null=True, blank=True)
+    description = models.TextField()
+    subtotal = models.FloatField(null=True, blank=True)
+    igst = models.FloatField(null=True,blank=True)
+    cgst = models.FloatField(null=True,blank=True)
+    sgst = models.FloatField(null=True,blank=True)
+    tax_amount =  models.FloatField(null=True,blank=True)
+    adjustment = models.FloatField(null=True, blank=True)
+    total_amount = models.FloatField(null=True, blank=True)
+
+class DeletedEstimate(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
+    company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
+    ref_no = models.CharField(max_length=50)
+
+
+class Estimate_items(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
+    company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
+    eid = models.ForeignKey(Estimate, on_delete=models.CASCADE)
+    item = models.ForeignKey(ItemModel, on_delete=models.CASCADE,null=True, blank=True)
+    name = models.CharField(max_length=200)
+    hsn = models.CharField(max_length=15)
+    quantity = models.PositiveIntegerField()
+    price = models.FloatField()
+    tax = models.CharField(max_length=10)
+    discount = models.FloatField()
+    total = models.FloatField()
+
+# ==================================shemeem --end =======================================

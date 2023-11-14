@@ -18,7 +18,7 @@ urlpatterns = [
     path('estimate_quotation', views.estimate_quotation, name='estimate_quotation'),
     path('payment_in', views.payment_in, name='payment_in'),
     path('sale_order', views.sale_order, name='sale_order'),
-    path('delivery_chellan', views.delivery_chellan, name='delivery_chellan'),
+    path('delivery_challan', views.delivery_challan, name='delivery_challan'),
     path('sale_return_cr', views.sale_return_cr, name='sale_return_cr'),
 
     # created by athul
@@ -115,6 +115,16 @@ urlpatterns = [
     path('edit_saveparty/<int:id>', views.edit_saveparty, name='edit_saveparty'),
     path('deleteparty/<int:id>', views.deleteparty, name='deleteparty'),
     #End
+
+
+    # =========== estimate & delivery challan=========== shemeem - start =======================================
+    path('create_estimate',views.create_estimate, name='create_estimate'),
+    path('get_party_details',views.getPartyDetails, name='getPartyDetails'),
+    path('get_item_data',views.getItemData, name='getItemData'),
+    path('create_new_estimate',views.createNewEstimate, name='createNewEstimate'),
+
+
+    # ===================================== shemeem - end ================================================== 
     
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
     
