@@ -160,6 +160,7 @@ class Estimate(models.Model):
     tax_amount =  models.FloatField(null=True,blank=True)
     adjustment = models.FloatField(null=True, blank=True)
     total_amount = models.FloatField(null=True, blank=True)
+    balance = models.FloatField(null=True, blank=True)
 
 class DeletedEstimate(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)

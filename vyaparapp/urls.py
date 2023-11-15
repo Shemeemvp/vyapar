@@ -122,6 +122,8 @@ urlpatterns = [
     path('get_party_details',views.getPartyDetails, name='getPartyDetails'),
     path('get_item_data',views.getItemData, name='getItemData'),
     path('create_new_estimate',views.createNewEstimate, name='createNewEstimate'),
+    path('get_party_list',views.getPartyList, name= 'getPartyList'),
+    path('get_item_list',views.getItemList, name = 'getItemList'),
 
 
     # ===================================== shemeem - end ================================================== 

@@ -109,8 +109,9 @@ def sale_invoices(request):
 def estimate_quotation(request):
   com =  company.objects.get(user = request.user)
   allmodules= modules_list.objects.get(company=com.id,status='New')
+  estimates = Estimate.objects.filter(company = com)
   context = {
-    'company':com,'allmodules':allmodules
+    'company':com,'allmodules':allmodules, 'estimates':estimates,
   }
   return render(request, 'company/estimate_quotation.html',context)
 
@@ -1196,6 +1197,7 @@ def create_estimate(request):
     allmodules= modules_list.objects.get(company=com.id,status='New')
     parties = party.objects.filter(company = com)
     items = ItemModel.objects.filter(company = com)
+    item_units = UnitModel.objects.filter(company=com)
 
     # Fetching last bill and assigning upcoming bill no as current + 1
     # Also check for if any bill is deleted and bill no is continuos w r t the deleted bill
@@ -1216,7 +1218,7 @@ def create_estimate(request):
 
     
     context = {
-      'company':com,'allmodules':allmodules, 'parties':parties, 'ref_no':new_number,'items':items,
+      'company':com,'allmodules':allmodules, 'parties':parties, 'ref_no':new_number,'items':items,'item_units':item_units,
     }
     return render(request, 'company/create_estimate.html',context)
   except Exception as e:
@@ -1310,5 +1312,27 @@ def createNewEstimate(request):
         print(e)
         return redirect(create_estimate)
   return redirect('/')
+
+
+def getPartyList(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    options = {}
+    option_objects = party.objects.filter(company = com)
+    for option in option_objects:
+        options[option.id] = [option.id , option.party_name]
+
+    return JsonResponse(options)
+
+
+def getItemList(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    options = {}
+    option_objects = ItemModel.objects.filter(company = com)
+    for option in option_objects:
+        options[option.id] = [option.item_name]
+
+    return JsonResponse(options)
 
 # ===================end ---shemeem =============================
