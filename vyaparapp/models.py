@@ -161,6 +161,8 @@ class Estimate(models.Model):
     adjustment = models.FloatField(null=True, blank=True)
     total_amount = models.FloatField(null=True, blank=True)
     balance = models.FloatField(null=True, blank=True)
+    status = models.CharField(max_length=50, null=True)
+    is_converted = models.BooleanField(null=True, default=False)
 
 class DeletedEstimate(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)

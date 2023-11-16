@@ -25,7 +25,7 @@ urlpatterns = [
     path('settings', views.settings, name='settings'),
     path('hide_options', views.hide_options, name='hide_options'),
 
-    path('staffhome/<id>', views.staffhome, name='staffhome'),
+    path('staffhome', views.staffhome, name='staffhome'),
     path('adminhome', views.adminhome, name='adminhome'),
     
     
@@ -124,6 +124,17 @@ urlpatterns = [
     path('create_new_estimate',views.createNewEstimate, name='createNewEstimate'),
     path('get_party_list',views.getPartyList, name= 'getPartyList'),
     path('get_item_list',views.getItemList, name = 'getItemList'),
+    path('estimate_filter_with_date',views.estimateFilterWithDate, name='estimateFilterWithDate'),
+    path('estimate_filter_with_ref',views.estimateFilterWithRef, name='estimateFilterWithRef'),
+    path('estimate_filter_with_name',views.estimateFilterWithName, name='estimateFilterWithName'),
+    path('estimate_filter_with_total',views.estimateFilterWithTotal, name='estimateFilterWithTotal'),
+    path('estimate_filter_with_bal',views.estimateFilterWithBal, name='estimateFilterWithBal'),
+    path('estimate_filter_with_stat',views.estimateFilterWithStat, name='estimateFilterWithStat'),
+    path('estimate_in_between', views.estimateInBetween, name='estimateInBetween'),
+    path('edit_estimate/<int:id>',views.editEstimate, name='editEstimate'),
+    path('update_estimate/<int:id>',views.updateEstimate, name= 'updateEstimate'),
+    path('delete_estimate_quotation/<int:id>',views.deleteEstimate, name = 'deleteEstimate'),
+
 
 
     # ===================================== shemeem - end ================================================== 

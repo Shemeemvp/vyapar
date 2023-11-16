@@ -1284,6 +1284,9 @@ def createNewEstimate(request):
               tax_amount = request.POST['tax_amount'],
               adjustment = request.POST['adjustment'],
               total_amount = request.POST['grand_total'],
+              balance = 0,
+              status = 'Open',
+              is_converted = False
             )
             estimate.save()
             
@@ -1334,5 +1337,242 @@ def getItemList(request):
         options[option.id] = [option.item_name]
 
     return JsonResponse(options)
+  
+
+def estimateFilterWithDate(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      date = request.GET['date_filter_value']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      estimates = Estimate.objects.filter(company = com, date = date)
+      context = {
+        'company':com,'allmodules':allmodules, 'estimates':estimates,
+      }
+      if not estimates:
+        messages.warning(request, f'No Estimates found on {date}.!')
+      return render(request, 'company/estimate_quotation.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(estimate_quotation)
+    
+
+def estimateFilterWithRef(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      ref = request.GET['ref_filter_value']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      estimates = Estimate.objects.filter(company = com, ref_no = ref)
+      context = {
+        'company':com,'allmodules':allmodules, 'estimates':estimates,
+      }
+      if not estimates:
+        messages.warning(request, f'No Estimates found with Ref No. {ref}.!')
+      return render(request, 'company/estimate_quotation.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(estimate_quotation)
+
+
+def estimateFilterWithBal(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      bal = request.GET['bal_filter_value']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      estimates = Estimate.objects.filter(company = com, balance = bal)
+      context = {
+        'company':com,'allmodules':allmodules, 'estimates':estimates,
+      }
+      if not estimates:
+        messages.warning(request, f'No Estimates found with Balance amount {bal}.!')
+      return render(request, 'company/estimate_quotation.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(estimate_quotation)
+
+
+def estimateFilterWithName(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      name = request.GET['name_filter_value']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      estimates = Estimate.objects.filter(company = com, party_name = name)
+      context = {
+        'company':com,'allmodules':allmodules, 'estimates':estimates,
+      }
+      if not estimates:
+        messages.warning(request, f'No Estimates found with Party Name {name}.!')
+      return render(request, 'company/estimate_quotation.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(estimate_quotation)
+
+
+def estimateFilterWithTotal(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      tot = request.GET['total_filter_value']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      estimates = Estimate.objects.filter(company = com, total_amount = tot)
+      context = {
+        'company':com,'allmodules':allmodules, 'estimates':estimates,
+      }
+      if not estimates:
+        messages.warning(request, f'No Estimates found with Total Amount {tot}.!')
+      return render(request, 'company/estimate_quotation.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(estimate_quotation)
+    
+  
+def estimateFilterWithStat(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      stat = request.GET['status']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      estimates = Estimate.objects.filter(company = com, status = stat)
+      context = {
+        'company':com,'allmodules':allmodules, 'estimates':estimates,
+      }
+      if not estimates:
+        messages.warning(request, f'No Estimates found with Status {stat}.!')
+      return render(request, 'company/estimate_quotation.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(estimate_quotation)
+   
+
+
+def estimateInBetween(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      fromDate = request.GET['from_date']
+      toDate = request.GET['to_date']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      estimates = Estimate.objects.filter(company = com).filter(date__gte = fromDate, date__lte = toDate)
+      context = {
+        'company':com,'allmodules':allmodules, 'estimates':estimates,
+      }
+      if not estimates:
+        messages.warning(request, f'No Estimates found in between {fromDate} to {toDate}.!')
+      return render(request, 'company/estimate_quotation.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(estimate_quotation)
+
+
+def deleteEstimate(request,id):
+  if request.user:
+    com = company.objects.get(user = request.user.id)
+    try:
+      est = Estimate.objects.get(company = com, id = id)
+      
+      Estimate_items.objects.filter(company = com , eid = est).delete()
+      est.delete()
+      messages.success(request, 'Estimate deleted successfully.!')
+      return redirect(estimate_quotation)
+    except Exception as e:
+      print(e)
+      return redirect(estimate_quotation)
+  return redirect('/')
+
+
+def editEstimate(request, id):
+  if request.user:
+    com = company.objects.get(user = request.user.id)
+    try:
+      est = Estimate.objects.get(company = com , id = id)
+      est_items = Estimate_items.objects.filter(company = com , eid = est)
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      parties = party.objects.filter(company = com)
+      items = ItemModel.objects.filter(company = com)
+      item_units = UnitModel.objects.filter(company=com)
+      context = {
+        'company':com,'allmodules':allmodules, 'parties':parties,'items':items,'item_units':item_units, 'estimate':est, 'estItems':est_items,
+      }
+      return render(request, 'company/edit_estimate.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(estimate_quotation)
+    
+
+def updateEstimate(request, id):
+  if request.user:
+    com = company.objects.get(user = request.user.id)
+    try:
+      estimate = Estimate.objects.get(company = com, id = id)
+      if request.method == 'POST':
+        estimate.date = request.POST['date']
+        estimate.ref_no = request.POST['ref_no']
+        estimate.party_name = party.objects.get(id = request.POST['party_name']).party_name
+        estimate.contact = request.POST['contact']
+        estimate.billing_address = request.POST['address']
+        estimate.state_of_supply = 'State' if request.POST['state_supply'] == 'state' else 'Other State'
+        estimate.description = request.POST['description']
+        estimate.subtotal = request.POST['subtotal']
+        estimate.cgst = request.POST['cgst_tax']
+        estimate.sgst = request.POST['sgst_tax']
+        estimate.igst = request.POST['igst_tax']
+        estimate.tax_amount = request.POST['tax_amount']
+        estimate.adjustment = request.POST['adjustment']
+        estimate.total_amount = request.POST['grand_total']
+        estimate.balance = 0
+        estimate.status = 'Open'
+        estimate.is_converted = False
+
+        estimate.save()
+
+        ids = request.POST.getlist('estItems[]')
+        item = request.POST.getlist("item[]")
+        hsn  = request.POST.getlist("hsn[]")
+        qty = request.POST.getlist("qty[]")
+        price = request.POST.getlist("price[]")
+        tax = request.POST.getlist("taxgst[]") if request.POST['state_supply'] == 'state' else request.POST.getlist("taxigst[]")
+        discount = request.POST.getlist("discount[]")
+        total = request.POST.getlist("total[]")
+        est_item_ids = request.POST.getlist("id[]")
+        
+        item_ids = [int(id) for id in est_item_ids]
+
+        
+        est_item = Estimate_items.objects.filter(eid = estimate)
+        object_ids = [obj.id for obj in est_item]
+
+        ids_to_delete = [obj_id for obj_id in object_ids if obj_id not in item_ids]
+
+        Estimate_items.objects.filter(id__in=ids_to_delete).delete()
+        
+        count = Estimate_items.objects.filter(eid = estimate, company = com).count()
+        if len(ids)==len(item)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total):
+            try:
+                mapped=zip(ids,item,hsn,qty,price,tax,total,discount,item_ids)
+                mapped=list(mapped)
+                
+                for ele in mapped:
+                    if int(len(item))>int(count):
+                        if ele[8] == 0:
+                            itemAdd= Estimate_items.objects.create(name = ele[1], hsn=ele[2],quantity=ele[3],price=ele[4],tax=ele[5],total=ele[6],discount=ele[7] ,eid = estimate ,company = com, item = ItemModel.objects.get(company = com, id = ele[0]))
+                        else:
+                            itemAdd = Estimate_items.objects.filter( id = ele[8],company = com).update(name = ele[1],hsn=ele[2],quantity=ele[3],price=ele[4],tax=ele[5],total=ele[6],discount=ele[7], item = ItemModel.objects.get(company = com, id = ele[0]))
+                    else:
+                        itemAdd = Estimate_items.objects.filter( id = ele[8],company=com).update(name = ele[1],hsn=ele[2],quantity=ele[3],price=ele[4],tax=ele[5],total=ele[6],discount=ele[7], item = ItemModel.objects.get(company = com, id = ele[0]))
+            except Exception as e:
+                    print(e)
+                    mapped=zip(ids,item,hsn,qty,price,tax,total,discount,item_ids)
+                    mapped=list(mapped)
+                    
+                    for ele in mapped:
+                        created =Estimate_items.objects.filter(id=ele[8] ,company=com).update(name = ele[1],hsn=ele[2],quantity=ele[3],price=ele[4],tax=ele[5],total=ele[6],discount=ele[7], item = ItemModel.objects.get(company = com, id = ele[0]))
+
+        return redirect(estimate_quotation)
+    except Exception as e:
+      print(e)
+      return redirect(editEstimate, id)
 
 # ===================end ---shemeem =============================

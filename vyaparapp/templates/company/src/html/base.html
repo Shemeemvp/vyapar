@@ -171,9 +171,10 @@
                   <hr>
                   {% endif %}
                   {% if allmodules.Delivery_challan != Null %}
-                  <a href="{% url 'delivery_challan' %}" class="d-flex align-items-center gap-2 dropdown-item">
+                  <a href="#" class="d-flex align-items-center justify-content-between gap-2 dropdown-item">
                     <!-- <i class="ti ti-mail fs-6"></i> -->
-                    <p class="mb-0 fs-3">Delivery Challan</p>
+                    <p class="mb-0 fs-3" onclick="window.location.href=`{% url 'delivery_challan' %}`">Delivery Challan</p>
+                    <i class="ti ti-plus fs-5 fw-bold" onclick="window.location.href=`{% url 'create_estimate' %}`"></i>
                   </a>
                   <hr>
                   {% endif %}
