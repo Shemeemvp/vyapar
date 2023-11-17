@@ -183,4 +183,46 @@ class Estimate_items(models.Model):
     discount = models.FloatField()
     total = models.FloatField()
 
+
+class DeliveryChallan(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
+    company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
+    challan_no = models.CharField(max_length=20, null=True)
+    date = models.DateField(null=True, blank=True)
+    due_date = models.DateField(null=True, blank=True)
+    party_name = models.CharField(max_length=150)
+    contact = models.CharField(max_length=255,null=True,blank=True)
+    billing_address = models.TextField()
+    state_of_supply = models.CharField(max_length=200, null=True, blank=True)
+    description = models.TextField()
+    subtotal = models.FloatField(null=True, blank=True)
+    igst = models.FloatField(null=True,blank=True)
+    cgst = models.FloatField(null=True,blank=True)
+    sgst = models.FloatField(null=True,blank=True)
+    tax_amount =  models.FloatField(null=True,blank=True)
+    adjustment = models.FloatField(null=True, blank=True)
+    total_amount = models.FloatField(null=True, blank=True)
+    balance = models.FloatField(null=True, blank=True)
+    status = models.CharField(max_length=50, null=True)
+    is_converted = models.BooleanField(null=True, default=False)
+
+class DeletedDeliveryChallan(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
+    company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
+    challan_no = models.CharField(max_length=50)
+
+
+class DeliveryChallanItems(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
+    company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
+    cid = models.ForeignKey(DeliveryChallan, on_delete=models.CASCADE)
+    item = models.ForeignKey(ItemModel, on_delete=models.CASCADE,null=True, blank=True)
+    name = models.CharField(max_length=200)
+    hsn = models.CharField(max_length=15)
+    quantity = models.PositiveIntegerField()
+    price = models.FloatField()
+    tax = models.CharField(max_length=10)
+    discount = models.FloatField()
+    total = models.FloatField()
+
 # ==================================shemeem --end =======================================

@@ -134,13 +134,13 @@
         </div>
         <div style="background-color: rgba(0, 195, 255, 0.205);" class="p-3 pb-0 mb-0">
             <div class="row pb-0 mb-0">
-                <div class="col text-center pb-2" style="border-bottom: 3px solid rgba(0, 0, 0, 0.548);"><a class="fw-bolder fs-4 text-dark" href="#">NEW ESTIMATE</a></div>
+                <div class="col text-center pb-2" style="border-bottom: 3px solid rgba(0, 0, 0, 0.548);"><a class="fw-bolder fs-4 text-dark" href="#">NEW DELIVERY CHALLAN</a></div>
             </div>
         </div>
 
         <div class="row pt-0 m-0 mt-3">
             <div class="card p-0 bg-light bs">
-                <form action="{% url 'createNewEstimate' %}" method="post" class="form">
+                <form action="{% url 'createNewDeliveryChallan' %}" method="post" class="form">
                     {% csrf_token %}
                     <div class="row m-0 p-0 pt-3">
                         <div class="col-md-4">
@@ -173,12 +173,16 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="reference_number">Ref No.</label>
-                                <input class="form-control border-dark fw-bolder text-dark" id="reference_number" type="text" autocomplete="off" name="ref_no" value="{{ref_no}}" readonly>
+                                <label for="challan_number">Challan No.</label>
+                                <input class="form-control border-dark fw-bolder text-dark" id="challan_number" type="text" autocomplete="off" name="challan_no" value="{{challan_no}}" readonly>
                             </div>
                             <div class="form-group mt-1">
                                 <label for="inv_date">Invoice Date</label>
-                                <input class="form-control border-dark fw-bolder text-dark" id="inv_date" type="date" name="date" value="{% now 'Y-m-d' %}">
+                                <input class="form-control border-dark fw-bolder text-dark" id="inv_date" type="date" name="date" value="{% now 'Y-m-d' %}" required>
+                            </div>
+                            <div class="form-group mt-1">
+                                <label for="due_date">Due Date</label>
+                                <input class="form-control border-dark fw-bolder text-dark" id="due_date" type="date" name="due_date" value="{% now 'Y-m-d' %}" required>
                             </div>
                             <div class="form-group mt-1">
                                 <label for="state_of_supply">State Of Supply</label>
@@ -207,7 +211,7 @@
                                   <th></th>
                                 </tr>
                               </thead>
-                              <tbody id="est-items-table-body">
+                              <tbody id="dc-items-table-body">
                                 <tr id='addr01'>
                                     <td class="item_sl_num">1</td>
                                     <td>
@@ -225,7 +229,7 @@
                                     </td>
                                     <td>
                                         <input type="number" name='hsn[]' id="hsn1" placeholder='HSN' class="form-control border-info bg-light" readonly/>
-                                        <input type="text" name="estItems[]" id="estitem1" hidden>
+                                        <input type="text" name="dcItems[]" id="dcitem1" hidden>
                                     </td>
                                     <td><input type="number" name='qty[]'placeholder='Quantity' id="qty1" value="" class="form-control border-info bg-light qty" min="1" required/></td>
                                     <td><input type="number" name='price[]' id="price1" placeholder='Sale Price' class="form-control border-info bg-light price" step="0.00" min="0" readonly /></td>
@@ -920,7 +924,7 @@
                     document.getElementById('taxgst'+n).value = response.gst;
                     document.getElementById('taxigst'+n).value = response.igst;
                 }
-                document.getElementById('estitem'+n).value = response.id;
+                document.getElementById('dcitem'+n).value = response.id;
                 refreshTax();
             }
         },
@@ -939,8 +943,8 @@
 
 
     $(document).on('click','.clone_row',function(){
-        var roinc = $("#est-items-table-body tr").length;
-        var originalRow = $(this).closest('#est-items-table-body tr'); 
+        var roinc = $("#dc-items-table-body tr").length;
+        var originalRow = $(this).closest('#dc-items-table-body tr'); 
         var clonedRow = originalRow.clone();
 
         clonedRow.attr('id', 'addr0' +(roinc+1));
@@ -969,9 +973,9 @@
     });
     $(document).ready(function(){
         $('#add_row_btn').click(function(){
-            var roinc = $("#est-items-table-body tr").length;
+            var roinc = $("#dc-items-table-body tr").length;
             roinc++;
-            $('#est-items-table-body').append(
+            $('#dc-items-table-body').append(
                 `<tr id='addr0${roinc}'>
                     <td class="item_sl_num">${roinc}</td>
                     <td>
@@ -989,7 +993,7 @@
                     </td>
                     <td>
                         <input type="number" name='hsn[]' id="hsn${roinc}" placeholder='HSN Code' class="form-control border-info bg-light" readonly/>
-                        <input type="text" name="estItems[]" id="estitem${roinc}" hidden>
+                        <input type="text" name="dcItems[]" id="dcitem${roinc}" hidden>
                     </td>
                     <td><input type="number" name='qty[]'placeholder='Quantity' id="qty${roinc}" value="" class="form-control border-info bg-light qty" min="1" required/></td>
                     <td><input type="number" name='price[]' id="price${roinc}" placeholder='Sale Price' class="form-control border-info bg-light price" step="0.00" min="0" readonly /></td>
@@ -1009,7 +1013,7 @@
         });
     });
 
-    $('#est-items-table-body').on('keyup change', function () {
+    $('#dc-items-table-body').on('keyup change', function () {
         calc();
     });
 

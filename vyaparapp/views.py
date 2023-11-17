@@ -124,8 +124,9 @@ def sale_order(request):
 def delivery_challan(request):
   com =  company.objects.get(user = request.user)
   allmodules= modules_list.objects.get(company=com.id,status='New')
+  challan = DeliveryChallan.objects.filter(company = com)
   context = {
-    'company':com,'allmodules':allmodules
+    'company':com,'allmodules':allmodules, 'challan':challan,
   }
   return render(request, 'company/delivery_challan.html',context)
 
@@ -1299,7 +1300,7 @@ def createNewEstimate(request):
             discount = request.POST.getlist("discount[]")
             total = request.POST.getlist("total[]")
 
-            est_id = Estimate.objects.get( ref_no = estimate.ref_no)
+            est_id = Estimate.objects.get( id = estimate.id)
 
             if len(ids)==len(item)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and ids and item and hsn and qty and price and tax and discount and total:
                 mapped = zip(ids,item,hsn,qty,price,tax,discount,total)
@@ -1346,11 +1347,14 @@ def estimateFilterWithDate(request):
       date = request.GET['date_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
       estimates = Estimate.objects.filter(company = com, date = date)
+      
+      if not estimates:
+        messages.warning(request, f'No Estimates found on {date}.!')
+        estimates = Estimate.objects.filter(company = com)
+      
       context = {
         'company':com,'allmodules':allmodules, 'estimates':estimates,
       }
-      if not estimates:
-        messages.warning(request, f'No Estimates found on {date}.!')
       return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
@@ -1364,11 +1368,14 @@ def estimateFilterWithRef(request):
       ref = request.GET['ref_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
       estimates = Estimate.objects.filter(company = com, ref_no = ref)
+      
+      if not estimates:
+        messages.warning(request, f'No Estimates found with Ref No. {ref}.!')
+        estimates = Estimate.objects.filter(company = com)
+      
       context = {
         'company':com,'allmodules':allmodules, 'estimates':estimates,
       }
-      if not estimates:
-        messages.warning(request, f'No Estimates found with Ref No. {ref}.!')
       return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
@@ -1382,11 +1389,14 @@ def estimateFilterWithBal(request):
       bal = request.GET['bal_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
       estimates = Estimate.objects.filter(company = com, balance = bal)
+
+      if not estimates:
+        messages.warning(request, f'No Estimates found with Balance amount {bal}.!')
+        estimates = Estimate.objects.filter(company = com)
+      
       context = {
         'company':com,'allmodules':allmodules, 'estimates':estimates,
       }
-      if not estimates:
-        messages.warning(request, f'No Estimates found with Balance amount {bal}.!')
       return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
@@ -1400,11 +1410,14 @@ def estimateFilterWithName(request):
       name = request.GET['name_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
       estimates = Estimate.objects.filter(company = com, party_name = name)
+
+      if not estimates:
+        messages.warning(request, f'No Estimates found with Party Name {name}.!')
+        estimates = Estimate.objects.filter(company = com)
+      
       context = {
         'company':com,'allmodules':allmodules, 'estimates':estimates,
       }
-      if not estimates:
-        messages.warning(request, f'No Estimates found with Party Name {name}.!')
       return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
@@ -1418,11 +1431,14 @@ def estimateFilterWithTotal(request):
       tot = request.GET['total_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
       estimates = Estimate.objects.filter(company = com, total_amount = tot)
+
+      if not estimates:
+        messages.warning(request, f'No Estimates found with Total Amount {tot}.!')
+        estimates = Estimate.objects.filter(company = com)
+
       context = {
         'company':com,'allmodules':allmodules, 'estimates':estimates,
       }
-      if not estimates:
-        messages.warning(request, f'No Estimates found with Total Amount {tot}.!')
       return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
@@ -1436,11 +1452,14 @@ def estimateFilterWithStat(request):
       stat = request.GET['status']
       allmodules= modules_list.objects.get(company=com.id,status='New')
       estimates = Estimate.objects.filter(company = com, status = stat)
+
+      if not estimates:
+        messages.warning(request, f'No Estimates found with Status {stat}.!')
+        estimates = Estimate.objects.filter(company = com)
+      
       context = {
         'company':com,'allmodules':allmodules, 'estimates':estimates,
       }
-      if not estimates:
-        messages.warning(request, f'No Estimates found with Status {stat}.!')
       return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
@@ -1456,11 +1475,14 @@ def estimateInBetween(request):
       toDate = request.GET['to_date']
       allmodules= modules_list.objects.get(company=com.id,status='New')
       estimates = Estimate.objects.filter(company = com).filter(date__gte = fromDate, date__lte = toDate)
+      
+      if not estimates:
+        messages.warning(request, f'No Estimates found in between {fromDate} to {toDate}.!')
+        estimates = Estimate.objects.filter(company = com)
+      
       context = {
         'company':com,'allmodules':allmodules, 'estimates':estimates,
       }
-      if not estimates:
-        messages.warning(request, f'No Estimates found in between {fromDate} to {toDate}.!')
       return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
@@ -1472,6 +1494,20 @@ def deleteEstimate(request,id):
     com = company.objects.get(user = request.user.id)
     try:
       est = Estimate.objects.get(company = com, id = id)
+
+      # Storing ref number to deleted table
+      # if entry exists and lesser than the current, update and save => Only one entry per company
+
+      if DeletedEstimate.objects.filter(company = com).exists():
+          deleted = DeletedEstimate.objects.get(company = com)
+          if deleted:
+              if est.ref_no > deleted.ref_no:
+                  deleted.ref_no = est.ref_no
+                  deleted.save()
+          
+      else:
+          deleted = DeletedEstimate(company = com, user = User.objects.get(id = request.user.id), ref_no = est.ref_no)
+          deleted.save()
       
       Estimate_items.objects.filter(company = com , eid = est).delete()
       est.delete()
@@ -1574,5 +1610,392 @@ def updateEstimate(request, id):
     except Exception as e:
       print(e)
       return redirect(editEstimate, id)
+
+
+def createDeliveryChallan(request):
+  if request.user:
+    com = company.objects.get(user = request.user.id)
+    try:
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      parties = party.objects.filter(company = com)
+      items = ItemModel.objects.filter(company = com)
+      item_units = UnitModel.objects.filter(company=com)
+
+      # Fetching last bill and assigning upcoming bill no as current + 1
+      # Also check for if any bill is deleted and bill no is continuos w r t the deleted bill
+      latest_bill = DeliveryChallan.objects.filter(company = com).order_by('-challan_no').first()
+
+      if latest_bill:
+          last_number = int(latest_bill.challan_no)
+          new_number = last_number + 1
+      else:
+          new_number = 1
+
+      if DeletedDeliveryChallan.objects.filter(company = com).exists():
+          deleted = DeletedDeliveryChallan.objects.get(company = com)
+          
+          if deleted:
+              while int(deleted.challan_no) >= new_number:
+                  new_number+=1
+
+      
+      context = {
+        'company':com,'allmodules':allmodules, 'parties':parties, 'challan_no':new_number,'items':items,'item_units':item_units,
+      }
+      return render(request, 'company/create_delivery_challan.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(delivery_challan)
+
+
+def createNewDeliveryChallan(request):
+  if request.user:
+    try:
+        com = company.objects.get(user=request.user.id)
+        if request.method == 'POST':
+            challan = DeliveryChallan(
+              company = com,
+              user = User.objects.get(id = request.user.id),
+              date = request.POST['date'],
+              due_date = request.POST['due_date'],
+              challan_no = request.POST['challan_no'],
+              party_name = party.objects.get(id = request.POST['party_name']).party_name,
+              contact = request.POST['contact'],
+              billing_address = request.POST['address'],
+              state_of_supply = 'State' if request.POST['state_supply'] == 'state' else 'Other State',
+              description = request.POST['description'],
+              subtotal = request.POST['subtotal'],
+              cgst = request.POST['cgst_tax'],
+              sgst = request.POST['sgst_tax'],
+              igst = request.POST['igst_tax'],
+              tax_amount = request.POST['tax_amount'],
+              adjustment = request.POST['adjustment'],
+              total_amount = request.POST['grand_total'],
+              balance = 0,
+              status = 'Open',
+              is_converted = False
+            )
+            challan.save()
+            
+            ids = request.POST.getlist('dcItems[]')
+            item = request.POST.getlist("item[]")
+            hsn  = request.POST.getlist("hsn[]")
+            qty = request.POST.getlist("qty[]")
+            price = request.POST.getlist("price[]")
+            tax = request.POST.getlist("taxgst[]") if request.POST['state_supply'] == 'state' else request.POST.getlist("taxigst[]")
+            discount = request.POST.getlist("discount[]")
+            total = request.POST.getlist("total[]")
+
+            chl_id = DeliveryChallan.objects.get( id = challan.id)
+
+            if len(ids)==len(item)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and ids and item and hsn and qty and price and tax and discount and total:
+                mapped = zip(ids,item,hsn,qty,price,tax,discount,total)
+                mapped = list(mapped)
+                for ele in mapped:
+                  dcItems = DeliveryChallanItems.objects.create(user = User.objects.get(id = request.user.id),cid = chl_id, company = com, item = ItemModel.objects.get(company = com, id = ele[0]),name = ele[1],hsn=ele[2],quantity=ele[3],price=ele[4],tax=ele[5],discount = ele[6],total=ele[7])
+            
+
+            if 'save_and_next' in request.POST:
+                return redirect(createDeliveryChallan)
+            return redirect(delivery_challan)
+    except Exception as e:
+        print(e)
+        return redirect(createDeliveryChallan)
+  return redirect('/')
+
+
+def challanInBetween(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      fromDate = request.GET['from_date']
+      toDate = request.GET['to_date']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      challan = DeliveryChallan.objects.filter(company = com).filter(date__gte = fromDate, date__lte = toDate)
+      
+      if not challan:
+        messages.warning(request, f'No Challans found in between {fromDate} to {toDate}.!')
+        challan = DeliveryChallan.objects.filter(company = com)
+      
+      context = {
+        'company':com,'allmodules':allmodules, 'challan':challan,
+      }
+      return render(request, 'company/delivery_challan.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(delivery_challan)
+
+
+def challanFilterWithDate(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      date = request.GET['date_filter_value']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      challan = DeliveryChallan.objects.filter(company = com, date = date)
+      
+      if not challan:
+        messages.warning(request, f'No Challans found on {date}.!')
+        challan = DeliveryChallan.objects.filter(company = com)
+      
+      context = {
+        'company':com,'allmodules':allmodules, 'challan':challan,
+      }
+      return render(request, 'company/delivery_challan.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(delivery_challan)
+    
+
+def challanFilterWithDueDate(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      date = request.GET['due_date_filter_value']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      challan = DeliveryChallan.objects.filter(company = com, due_date = date)
+      
+      if not challan:
+        messages.warning(request, f'No Challans found with Due Date {date}.!')
+        challan = DeliveryChallan.objects.filter(company = com)
+      
+      context = {
+        'company':com,'allmodules':allmodules, 'challan':challan,
+      }
+      return render(request, 'company/delivery_challan.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(delivery_challan)
+    
+
+def challanFilterWithChallanNo(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      chl = request.GET['challan_no_filter_value']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      challan = DeliveryChallan.objects.filter(company = com, challan_no = chl)
+      
+      if not challan:
+        messages.warning(request, f'No Challans found with Challan No. {chl}.!')
+        challan = DeliveryChallan.objects.filter(company = com)
+      
+      context = {
+        'company':com,'allmodules':allmodules, 'challan':challan,
+      }
+      return render(request, 'company/delivery_challan.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(delivery_challan)
+
+
+def challanFilterWithBal(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      bal = request.GET['bal_filter_value']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      challan = DeliveryChallan.objects.filter(company = com, balance = bal)
+
+      if not challan:
+        messages.warning(request, f'No Challans found with Balance amount {bal}.!')
+        challan = DeliveryChallan.objects.filter(company = com)
+      
+      context = {
+        'company':com,'allmodules':allmodules, 'challan':challan,
+      }
+      return render(request, 'company/delivery_challan.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(delivery_challan)
+
+
+def challanFilterWithName(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      name = request.GET['name_filter_value']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      challan = DeliveryChallan.objects.filter(company = com, party_name = name)
+
+      if not challan:
+        messages.warning(request, f'No Challans found with Party Name {name}.!')
+        challan = DeliveryChallan.objects.filter(company = com)
+      
+      context = {
+        'company':com,'allmodules':allmodules, 'challan':challan,
+      }
+      return render(request, 'company/delivery_challan.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(delivery_challan)
+
+
+def challanFilterWithTotal(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      tot = request.GET['total_filter_value']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      challan = DeliveryChallan.objects.filter(company = com, total_amount = tot)
+
+      if not challan:
+        messages.warning(request, f'No Challans found with Total Amount {tot}.!')
+        challan = DeliveryChallan.objects.filter(company = com)
+
+      context = {
+        'company':com,'allmodules':allmodules, 'challan':challan,
+      }
+      return render(request, 'company/delivery_challan.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(delivery_challan)
+    
+  
+def challanFilterWithStat(request):
+  if request.user:
+    com = company.objects.get(user=request.user.id)
+    try:
+      stat = request.GET['status']
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      challan = DeliveryChallan.objects.filter(company = com, status = stat)
+
+      if not challan:
+        messages.warning(request, f'No Challans found with Status {stat}.!')
+        challan = DeliveryChallan.objects.filter(company = com)
+      
+      context = {
+        'company':com,'allmodules':allmodules, 'challan':challan,
+      }
+      return render(request, 'company/delivery_challan.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(delivery_challan)
+
+
+def deleteChallan(request,id):
+  if request.user:
+    com = company.objects.get(user = request.user.id)
+    try:
+      challan = DeliveryChallan.objects.get(company = com, id = id)
+
+      # Storing ref number to deleted table
+      # if entry exists and lesser than the current, update and save => Only one entry per company
+
+      if DeletedDeliveryChallan.objects.filter(company = com).exists():
+          deleted = DeletedDeliveryChallan.objects.get(company = com)
+          if deleted:
+              if challan.challan_no > deleted.challan_no:
+                  deleted.challan_no = challan.challan_no
+                  deleted.save()
+          
+      else:
+          deleted = DeletedDeliveryChallan(company = com, user = User.objects.get(id = request.user.id), challan_no = challan.challan_no)
+          deleted.save()
+      
+      DeliveryChallanItems.objects.filter(company = com , cid = challan).delete()
+      challan.delete()
+      messages.success(request, 'Challan deleted successfully.!')
+      return redirect(delivery_challan)
+    except Exception as e:
+      print(e)
+      return redirect(delivery_challan)
+  return redirect('/')
+
+
+def editChallan(request, id):
+  if request.user:
+    com = company.objects.get(user = request.user.id)
+    try:
+      dc = DeliveryChallan.objects.get(company = com , id = id)
+      dc_items = DeliveryChallanItems.objects.filter(company = com , cid = dc)
+      allmodules= modules_list.objects.get(company=com.id,status='New')
+      parties = party.objects.filter(company = com)
+      items = ItemModel.objects.filter(company = com)
+      item_units = UnitModel.objects.filter(company=com)
+      context = {
+        'company':com,'allmodules':allmodules, 'parties':parties,'items':items,'item_units':item_units, 'challan':dc, 'dcItems':dc_items,
+      }
+      return render(request, 'company/edit_delivery_challan.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(delivery_challan)
+
+
+
+def updateChallan(request, id):
+  if request.user:
+    com = company.objects.get(user = request.user.id)
+    try:
+      challan = DeliveryChallan.objects.get(company = com, id = id)
+      if request.method == 'POST':
+        challan.date = request.POST['date']
+        challan.due_date = request.POST['due_date']
+        challan.challan_no = request.POST['challan_no']
+        challan.party_name = party.objects.get(id = request.POST['party_name']).party_name
+        challan.contact = request.POST['contact']
+        challan.billing_address = request.POST['address']
+        challan.state_of_supply = 'State' if request.POST['state_supply'] == 'state' else 'Other State'
+        challan.description = request.POST['description']
+        challan.subtotal = request.POST['subtotal']
+        challan.cgst = request.POST['cgst_tax']
+        challan.sgst = request.POST['sgst_tax']
+        challan.igst = request.POST['igst_tax']
+        challan.tax_amount = request.POST['tax_amount']
+        challan.adjustment = request.POST['adjustment']
+        challan.total_amount = request.POST['grand_total']
+        challan.balance = 0
+        challan.status = 'Open'
+        challan.is_converted = False
+
+        challan.save()
+
+        ids = request.POST.getlist('dcItems[]')
+        item = request.POST.getlist("item[]")
+        hsn  = request.POST.getlist("hsn[]")
+        qty = request.POST.getlist("qty[]")
+        price = request.POST.getlist("price[]")
+        tax = request.POST.getlist("taxgst[]") if request.POST['state_supply'] == 'state' else request.POST.getlist("taxigst[]")
+        discount = request.POST.getlist("discount[]")
+        total = request.POST.getlist("total[]")
+        dc_item_ids = request.POST.getlist("id[]")
+        
+        item_ids = [int(id) for id in dc_item_ids]
+
+        
+        dc_item = DeliveryChallanItems.objects.filter(cid = challan)
+        object_ids = [obj.id for obj in dc_item]
+
+        ids_to_delete = [obj_id for obj_id in object_ids if obj_id not in item_ids]
+
+        DeliveryChallanItems.objects.filter(id__in=ids_to_delete).delete()
+        
+        count = DeliveryChallanItems.objects.filter(cid = challan, company = com).count()
+        if len(ids)==len(item)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total):
+            try:
+                mapped=zip(ids,item,hsn,qty,price,tax,total,discount,item_ids)
+                mapped=list(mapped)
+                
+                for ele in mapped:
+                    if int(len(item))>int(count):
+                        if ele[8] == 0:
+                            itemAdd= DeliveryChallanItems.objects.create(name = ele[1], hsn=ele[2],quantity=ele[3],price=ele[4],tax=ele[5],total=ele[6],discount=ele[7] ,cid = challan ,company = com, item = ItemModel.objects.get(company = com, id = ele[0]))
+                        else:
+                            itemAdd = DeliveryChallanItems.objects.filter( id = ele[8],company = com).update(name = ele[1],hsn=ele[2],quantity=ele[3],price=ele[4],tax=ele[5],total=ele[6],discount=ele[7], item = ItemModel.objects.get(company = com, id = ele[0]))
+                    else:
+                        itemAdd = DeliveryChallanItems.objects.filter( id = ele[8],company=com).update(name = ele[1],hsn=ele[2],quantity=ele[3],price=ele[4],tax=ele[5],total=ele[6],discount=ele[7], item = ItemModel.objects.get(company = com, id = ele[0]))
+            except Exception as e:
+                    print(e)
+                    mapped=zip(ids,item,hsn,qty,price,tax,total,discount,item_ids)
+                    mapped=list(mapped)
+                    
+                    for ele in mapped:
+                        created =DeliveryChallanItems.objects.filter(id=ele[8] ,company=com).update(name = ele[1],hsn=ele[2],quantity=ele[3],price=ele[4],tax=ele[5],total=ele[6],discount=ele[7], item = ItemModel.objects.get(company = com, id = ele[0]))
+
+        return redirect(delivery_challan)
+    except Exception as e:
+      print(e)
+      return redirect(editChallan, id)
+
 
 # ===================end ---shemeem =============================

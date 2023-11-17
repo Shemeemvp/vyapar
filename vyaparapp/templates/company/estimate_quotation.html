@@ -141,6 +141,22 @@
             </div>
             <div class="col-md-3"></div>
         </div>
+        {% if not estimates %}
+        <div class="no_estimates_section">
+            <div class="row">
+                <div class="col-12 d-flex justify-content-center">
+                    <div class="image_section d-flex justify-content-center mt-5">
+                        <img src="{% static 'assets/estimate01.png' %}" class="img-fluid w-25" alt="Estimate">
+                    </div>
+                </div>
+                <div class="col-12 d-flex justify-content-center mt-4">
+                    <div class="addBtn_section d-flex justify-content-center">
+                        <button class="btn btn-sm btn-primary bg-gradient" type="button" onclick="window.location.href=`{% url 'create_estimate' %}`"><i class="fa fa-plus me-1"></i> Create Estimate Here</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
         <div style="background-color: rgba(0, 195, 255, 0.205);" class="p-3 pb-0 mb-0">
             <div class="row pb-0 mb-0">
                 <div class="col text-center pb-2" style="border-bottom: 3px solid rgba(0, 0, 0, 0.548);"><a class="fw-bolder fs-4 text-dark" href="#">ESTIMATE/QUOTATION</a></div>
@@ -340,7 +356,7 @@
                     </table>
             </div>
         </div>
-
+        {% endif %}
 
 
 

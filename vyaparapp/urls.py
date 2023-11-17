@@ -135,6 +135,19 @@ urlpatterns = [
     path('update_estimate/<int:id>',views.updateEstimate, name= 'updateEstimate'),
     path('delete_estimate_quotation/<int:id>',views.deleteEstimate, name = 'deleteEstimate'),
 
+    path('create_delivery_challan',views.createDeliveryChallan, name='createDeliveryChallan'),
+    path('create_new_delivery_challan',views.createNewDeliveryChallan, name='createNewDeliveryChallan'),
+    path('challan_in_between', views.challanInBetween, name='challanInBetween'),
+    path('challan_filter_with_date',views.challanFilterWithDate, name='challanFilterWithDate'),
+    path('challan_filter_with_duedate',views.challanFilterWithDueDate, name='challanFilterWithDueDate'),
+    path('challan_filter_with_challan_no',views.challanFilterWithChallanNo, name='challanFilterWithChallanNo'),
+    path('challan_filter_with_name',views.challanFilterWithName, name='challanFilterWithName'),
+    path('challan_filter_with_total',views.challanFilterWithTotal, name='challanFilterWithTotal'),
+    path('challan_filter_with_bal',views.challanFilterWithBal, name='challanFilterWithBal'),
+    path('challan_filter_with_stat',views.challanFilterWithStat, name='challanFilterWithStat'),
+    path('delete_delivery_challan/<int:id>',views.deleteChallan, name = 'deleteChallan'),
+    path('edit_challan/<int:id>',views.editChallan, name='editChallan'),
+    path('update_challan/<int:id>',views.updateChallan, name= 'updateChallan'),
 
 
     # ===================================== shemeem - end ================================================== 
