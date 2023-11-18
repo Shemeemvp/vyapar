@@ -134,6 +134,7 @@ urlpatterns = [
     path('edit_estimate/<int:id>',views.editEstimate, name='editEstimate'),
     path('update_estimate/<int:id>',views.updateEstimate, name= 'updateEstimate'),
     path('delete_estimate_quotation/<int:id>',views.deleteEstimate, name = 'deleteEstimate'),
+    path('estimate_transaction_history/<int:id>',views.estimateTransactionHistory, name='estimateTransactionHistory'),
 
     path('create_delivery_challan',views.createDeliveryChallan, name='createDeliveryChallan'),
     path('create_new_delivery_challan',views.createNewDeliveryChallan, name='createNewDeliveryChallan'),
@@ -148,6 +149,7 @@ urlpatterns = [
     path('delete_delivery_challan/<int:id>',views.deleteChallan, name = 'deleteChallan'),
     path('edit_challan/<int:id>',views.editChallan, name='editChallan'),
     path('update_challan/<int:id>',views.updateChallan, name= 'updateChallan'),
+    path('challan_transaction_history/<int:id>',views.challanTransactionHistory, name='challanTransactionHistory'),
 
 
     # ===================================== shemeem - end ================================================== 

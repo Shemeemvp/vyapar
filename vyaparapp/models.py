@@ -139,11 +139,50 @@ class TransactionModel(models.Model):
     trans_created_date = models.DateTimeField(auto_now_add=True,null=True)
 
 # ========================= ASHIKH V U (END)===========================
+class BankModel(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
+    company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
+    bank_name = models.CharField(max_length=255)
+    account_num = models.PositiveBigIntegerField(null=True)
+    ifsc = models.CharField(max_length=255)
+    branch_name = models.CharField(max_length=255)
+    upi_id = models.CharField(max_length=255)
+    as_of_date = models.DateField(null=True)
+    card_type = models.CharField(max_length=255)
+    open_balance = models.BigIntegerField(null=True)
+    current_balance = models.BigIntegerField(null=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    created_by = models.CharField(max_length=255,null=True)
 
+class BankTransactionModel(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
+    company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
+    from_here = models.ForeignKey(BankModel,related_name='from_this_bank',on_delete=models.CASCADE,null=True,blank=True)
+    to_here = models.ForeignKey(BankModel,related_name='to_this_bank',on_delete=models.CASCADE,null=True,blank=True)
+    type = models.CharField(max_length=255,null=True)
+    name = models.CharField(max_length=255,null=True)
+    date = models.DateField(null=True)
+    amount = models.BigIntegerField(default=0)
+    created_date = models.DateTimeField(auto_now_add=True)
+    transfer_type=models.CharField(max_length=255,null=True)
+    current_amount = models.BigIntegerField(default=0)
+    last_action = models.CharField(max_length=255,null=True)
+    by = models.CharField(max_length=255,null=True) 
+
+class BankTransactionHistory(models.Model):
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
+    company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
+    bank = models.ForeignKey(BankModel,on_delete=models.CASCADE,blank=True,null=True)
+    bank_trans = models.ForeignKey(BankTransactionModel,on_delete=models.CASCADE,blank=True,null=True)
+    date = models.DateField(auto_now_add=True,null=True)
+    action = models.CharField(max_length=255)
+    done_by = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
+    done_by_name = models.CharField(max_length=255)
 
 # ==============delivery challan & Estimate ============shemeem --start=======
 
 class Estimate(models.Model):
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
     ref_no = models.CharField(max_length=20, null=True)
@@ -165,12 +204,14 @@ class Estimate(models.Model):
     is_converted = models.BooleanField(null=True, default=False)
 
 class DeletedEstimate(models.Model):
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
     ref_no = models.CharField(max_length=50)
 
 
 class Estimate_items(models.Model):
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
     eid = models.ForeignKey(Estimate, on_delete=models.CASCADE)
@@ -183,8 +224,18 @@ class Estimate_items(models.Model):
     discount = models.FloatField()
     total = models.FloatField()
 
+class EstimateTransactionHistory(models.Model):
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
+    company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
+    estimate = models.ForeignKey(Estimate,on_delete=models.CASCADE,blank=True,null=True)
+    date = models.DateField(auto_now_add=True,auto_now=False,null=True)
+    action = models.CharField(max_length=255)
+    
+
 
 class DeliveryChallan(models.Model):
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
     challan_no = models.CharField(max_length=20, null=True)
@@ -207,12 +258,14 @@ class DeliveryChallan(models.Model):
     is_converted = models.BooleanField(null=True, default=False)
 
 class DeletedDeliveryChallan(models.Model):
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
     challan_no = models.CharField(max_length=50)
 
 
 class DeliveryChallanItems(models.Model):
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
     cid = models.ForeignKey(DeliveryChallan, on_delete=models.CASCADE)
@@ -225,4 +278,14 @@ class DeliveryChallanItems(models.Model):
     discount = models.FloatField()
     total = models.FloatField()
 
+
+class DeliveryChallanTransactionHistory(models.Model):
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
+    company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
+    challan = models.ForeignKey(DeliveryChallan,on_delete=models.CASCADE,blank=True,null=True)
+    date = models.DateField(auto_now_add=True,auto_now=False,null=True)
+    action = models.CharField(max_length=255)
+
+    
 # ==================================shemeem --end =======================================
