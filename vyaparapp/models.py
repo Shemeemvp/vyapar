@@ -219,9 +219,9 @@ class Estimate_items(models.Model):
     name = models.CharField(max_length=200)
     hsn = models.CharField(max_length=15)
     quantity = models.PositiveIntegerField()
-    price = models.FloatField()
+    price = models.FloatField(null=True, blank=True)
     tax = models.CharField(max_length=10)
-    discount = models.FloatField()
+    discount = models.FloatField(null=True,blank=True)
     total = models.FloatField()
 
 class EstimateTransactionHistory(models.Model):
@@ -273,9 +273,9 @@ class DeliveryChallanItems(models.Model):
     name = models.CharField(max_length=200)
     hsn = models.CharField(max_length=15)
     quantity = models.PositiveIntegerField()
-    price = models.FloatField()
+    price = models.FloatField(null=True, blank=True)
     tax = models.CharField(max_length=10)
-    discount = models.FloatField()
+    discount = models.FloatField(null=True, blank=True)
     total = models.FloatField()
 
 

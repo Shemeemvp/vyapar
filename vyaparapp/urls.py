@@ -135,6 +135,10 @@ urlpatterns = [
     path('update_estimate/<int:id>',views.updateEstimate, name= 'updateEstimate'),
     path('delete_estimate_quotation/<int:id>',views.deleteEstimate, name = 'deleteEstimate'),
     path('estimate_transaction_history/<int:id>',views.estimateTransactionHistory, name='estimateTransactionHistory'),
+    path('import_estimate_form_excel',views.importEstimateFromExcel, name='importEstimateFromExcel'),
+    path('download_estimate_sample_file',views.downloadEstimateSampleImportFile, name = 'downloadEstimateSampleImportFile'),
+    path('estimate_bill_pdf_view/<int:id>',views.estimateBillPdf, name='estimateBillPdf'),
+
 
     path('create_delivery_challan',views.createDeliveryChallan, name='createDeliveryChallan'),
     path('create_new_delivery_challan',views.createNewDeliveryChallan, name='createNewDeliveryChallan'),
@@ -150,6 +154,9 @@ urlpatterns = [
     path('edit_challan/<int:id>',views.editChallan, name='editChallan'),
     path('update_challan/<int:id>',views.updateChallan, name= 'updateChallan'),
     path('challan_transaction_history/<int:id>',views.challanTransactionHistory, name='challanTransactionHistory'),
+    path('import_challan_form_excel',views.importChallanFromExcel, name='importChallanFromExcel'),
+    path('download_challan_sample_file',views.downloadChallanSampleImportFile, name = 'downloadChallanSampleImportFile'),
+    path('challan_bill_pdf_view/<int:id>',views.challanBillPdf, name='challanBillPdf'),
 
 
     # ===================================== shemeem - end ================================================== 

@@ -129,7 +129,9 @@
     .btn.dropdown-toggle{
         border: none;
     }
-    
+    .file_instructions p{
+        margin-bottom: 0.75rem;
+    }
 </style>
 <div class="body-wrapper">
     <div class="container-fluid">
@@ -196,12 +198,13 @@
                     <div class="option_btn d-flex align-items-center">
                         <!-- <button class="btn btn-sm btn-outline-secondary me-2" onclick="window.location.href=`{% url 'create_estimate' %}`"><i class="fa fa-plus me-1"></i>ESTIMATE</button> -->
                         <button class="btn btn-sm" type="button" onclick="printSection('print_export_section')" title="PRINT"><span><img width="22px" src="{% static 'assets/printer1.png' %}" alt="no img"></span></button>
-                        <form id="myForm" action="" method="POST" class="p-0 m-0 " enctype="multipart/form-data">
+                        <!-- <form id="myForm" action="{% url 'importChallanFromExcel' %}" method="POST" class="p-0 m-0 " enctype="multipart/form-data">
                             {% csrf_token %}
-                            <input id="file_" hidden type="file" name="excel_file">
-                            <label for="file_" class="btn p-1 ps-1 pe-1 m-0" type="button" title="IMPORT"><span><img draggable="false" width="22px" src="{% static 'assets/excel02.png' %}" alt="no img"></span></label>
+                            <input id="excel_file" hidden type="file" name="excel_file">
+                            <label for="excel_file" class="btn p-1 ps-1 pe-1 m-0" type="button" title="IMPORT"><span><img draggable="false" width="22px" src="{% static 'assets/excel02.png' %}" alt="no img"></span></label>
                             <input id="submit_import_excel" hidden type="submit">
-                        </form>
+                        </form> -->
+                        <button class="btn btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#importChallan" title="EXPORT"><span><img width="22px" src="{% static 'assets/excel02.png' %}" alt="no img"></span></button>
                         <button class="btn btn-sm" type="button" onclick="exportToExcel()" title="EXPORT"><span><img width="22px" src="{% static 'assets/excel2.png' %}" alt="no img"></span></button>
                     </div>
                 </div>
@@ -424,7 +427,49 @@
             </table>
         </div>
     </div>
-</div> 
+</div>
+
+
+<!-- Import Challan modal -->
+<div class="modal fade" id="importChallan">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-body bg-light rounded-1">
+                <div class="d-flex justify-content-between">
+                    <h3 class="m-3">IMPORT DELIVERY CHALLAN</h3>
+                    <button type="button" class="btn fs-4" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
+                </div>
+                <div class="file_instructions">
+                    <div class="alert alert-danger" role="alert">
+                        <span class="fw-bolder">IMPORTANT:</span>
+                        <p>File should have 2 sheets named 'challan' & 'items' and column name & order should be in the given formate(Uppercase).</p>
+                        <p class="fw-bolder">Challan sheet - SLNO*, DATE, DUE DATE, NAME*, STATE OF SUPPLY*, DESCRIPTION, SUB TOTAL*, IGST*, CGST*, SGST*, TAX AMOUNT*, ADJUSTMENT, GRAND TOTAL* </p>
+                        <p class="fw-bolder">Items sheet - CHALLAN NO**, NAME*, HSN*, QUANTITY*, PRICE*, TAX PERCENTAGE*, DISCOUNT, TOTAL* </p>
+                        <p>* All required columns should be filled.</p>
+                        <p>** <b>CHALLAN NO</b> is <b>SLNO</b> of challan</p>
+                        <p>State of supply should be '<b>State</b>' or '<b>Other State</b>'. State -> CGST* & SGST*, Other State -> IGST*</p>
+                        <p>Date format should be 'YYYY-MM-DD' or 'DD-MM-YYYY'.</p>
+                    </div>
+                </div>
+                <div class="sample_file mb-2">
+                    <a href="{% url 'downloadChallanSampleImportFile' %}" class="fw-bolder">Download Sample File</a>
+                </div>
+                <form id="importChallanForm" action="{% url 'importChallanFromExcel' %}" method="POST" class="form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="excel_file" class="form-label">File</label>
+                        <input id="excel_file" class="form-control" type="file" name="excel_file" required>
+                    </div>
+                    <div class="d-flex justify-content-center mt-2">
+                        <input id="submit_import_excel" value="IMPORT" class="btn btn-info bg-gradient" type="submit">
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
     $(document).ready(function() {
@@ -471,6 +516,11 @@
             }
         });
     }
+    $(document).ready(function(){
+        $('#excel_file').on('change',function(){
+            $('#submit_import_excel').click()
+        })
+    })
 </script>
 
 {%if messages%} {%for message in messages%} {%if message.tags == "success"%}
