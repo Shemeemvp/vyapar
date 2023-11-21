@@ -102,6 +102,32 @@ urlpatterns = [
     path('item_transaction_view_or_edit/<int:pk>/<int:tran>', views.item_transaction_view_or_edit, name='item_transaction_view_or_edit'),
     path('update_adjusted_transaction/<int:pk>/<int:tran>', views.update_adjusted_transaction, name='update_adjusted_transaction'),
     path('item_delete_open_stk/<int:pk>',views.item_delete_open_stk,name='item_delete_open_stk'),
+
+    path('bank_create',views.bank_create,name='bank_create'),
+    path('banks_list/<int:pk>',views.banks_list,name='banks_list'),
+    path('get_bank_to_bank',views.get_bank_to_bank,name='get_bank_to_bank'),
+    path('get_bank_to_cash',views.get_bank_to_cash,name='get_bank_to_cash'),
+    path('get_cash_to_bank',views.get_cash_to_bank,name='get_cash_to_bank'),
+    path('get_adjust_bank_balance',views.get_adjust_bank_balance,name='get_adjust_bank_balance'),
+    path('bank_create_new',views.bank_create_new,name='bank_create_new'),
+    path('bank_delete/<int:pk>',views.bank_delete,name='bank_delete'),
+    path('account_num_check',views.account_num_check,name='account_num_check'),
+    path('account_num_check_for_edit/<int:pk>',views.account_num_check_for_edit,name='account_num_check_for_edit'),
+    path('bank_ifsc_check',views.bank_ifsc_check,name='bank_ifsc_check'),
+    path('bank_view_or_edit/<int:pk>',views.bank_view_or_edit,name='bank_view_or_edit'),
+    path('bank_update/<int:pk>',views.bank_update,name='bank_update'),
+    path('bank_to_bank_transaction_create',views.bank_to_bank_transaction_create,name='bank_to_bank_transaction_create'),
+    path('bank_to_cash_transaction_create',views.bank_to_cash_transaction_create,name='bank_to_cash_transaction_create'),
+    path('cash_to_bank_transaction_create',views.cash_to_bank_transaction_create,name='cash_to_bank_transaction_create'),
+    path('get_adjust_bank_balance_create',views.get_adjust_bank_balance_create,name='get_adjust_bank_balance_create'),
+    path('delete_bank_open_balance/<int:pk>',views.delete_bank_open_balance,name='delete_bank_open_balance'),
+    path('delete_bank_transaction/<int:pk>/<int:bank_id>',views.delete_bank_transaction,name='delete_bank_transaction'),
+    path('view_or_edit_bank_transaction/<int:pk>/<int:bank_id>',views.view_or_edit_bank_transaction,name='view_or_edit_bank_transaction'),
+    path('update_bank_transaction/<int:pk>/<int:bank_id>',views.update_bank_transaction,name='update_bank_transaction'),
+    path('import_from_excel/<int:pk>',views.import_from_excel,name='import_from_excel'),
+    path('import_statement_from_excel/<int:pk>',views.import_statement_from_excel,name='import_statement_from_excel'),
+    path('transaction_history/<int:pk>/<int:bank_id>',views.transaction_history,name='transaction_history'),
+    path('bank_transaction_statement/<int:bank_id>',views.bank_transaction_statement,name='bank_transaction_statement'),
     
     # ========================================   ASHIKH V U (END) ======================================================
     
@@ -115,8 +141,27 @@ urlpatterns = [
     path('edit_saveparty/<int:id>', views.edit_saveparty, name='edit_saveparty'),
     path('deleteparty/<int:id>', views.deleteparty, name='deleteparty'),
     #End
-
-
+    
+    path('view_purchasebill',views.view_purchasebill,name='view_purchasebill'),
+    path('add_purchasebill',views.add_purchasebill,name='add_purchasebill'), 
+    path('create_purchasebill',views.create_purchasebill,name='create_purchasebill'),
+    path('edit_purchasebill/<int:id>',views.edit_purchasebill,name='edit_purchasebill'),
+    path('update_purchasebill/<int:id>',views.update_purchasebill,name='update_purchasebill'),
+    path('details_purchasebill/<int:id>',views.details_purchasebill,name='details_purchasebill'),
+    path('history_purchasebill/<int:id>',views.history_purchasebill,name='history_purchasebill'),
+    path('delete_purchasebill/<int:id>',views.delete_purchasebill,name='delete_purchasebill'), 
+    path('import_purchase_bill',views.import_purchase_bill,name='import_purchase_bill'), 
+    path('billhistory',views.billhistory,name='billhistory'), 
+    path('bankdata',views.bankdata,name='bankdata'), 
+    path('savecustomer',views.savecustomer,name='savecustomer'),
+    path('cust_dropdown',views.cust_dropdown,name='cust_dropdown'),
+    path('saveitem',views.saveitem,name='saveitem'),
+    path('item_dropdown',views.item_dropdown,name='item_dropdown'),
+    path('custdata',views.custdata,name='custdata'),
+    path('itemdetails',views.itemdetails,name='itemdetails'),
+    path('add_purchaseorder',views.add_purchaseorder,name='add_purchaseorder'),
+    path('view_purchaseorder',views.view_purchaseorder,name='view_purchaseorder'),
+    
     # =========== estimate & delivery challan=========== shemeem - start =======================================
     path('create_estimate',views.create_estimate, name='create_estimate'),
     path('add_new_party',views.addNewParty, name='addNewParty'),

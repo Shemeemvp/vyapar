@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="{% static 'assets/css/styles.min.css' %}" />
   <!-- Font Awesome CSS CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
@@ -171,11 +172,11 @@
               </button>
               <div class="dropdown-container" style="background-color: aliceblue;padding: 20px;justify-content: center;">
                 {% if allmodules.Purchase_bills != Null %}
-                  <a href="" class="d-flex align-items-center gap-2 dropdown-item">
+                  <a href="{% url 'view_purchasebill' %}" class="d-flex align-items-center gap-2 dropdown-item">
                     <!-- <i class="ti ti-mail fs-6"></i> -->
                     <div class="d-flex">
                       <p class="mb-0 fs-3">Purchase Bills</p>
-                      <a href=""><i class="fa fa-plus text-dark" ></i></a>
+                      <a href="{% url 'add_purchasebill' %}"><i class="fa fa-plus text-dark" ></i></a>
                     </div>
                   </a>
                   <hr>
@@ -188,11 +189,11 @@
                   <hr>
                   {% endif %}
                   {% if allmodules.Purchase_order != Null %}
-                  <a href="" class="d-flex align-items-center gap-2 dropdown-item">
+                  <a href="{% url 'view_purchaseorder' %}" class="d-flex align-items-center gap-2 dropdown-item">
                     <!-- <i class="ti ti-list-check fs-6"></i> -->
                     <div class="d-flex">
                       <p class="mb-0 fs-3">Purchase Order</p>
-                      <a href=""><i class="fa fa-plus text-dark" ></i></a>
+                      <a href="{% url 'add_purchaseorder' %}"><i class="fa fa-plus text-dark" ></i></a>
                     </div>
                   </a>
                   <hr>
@@ -235,10 +236,10 @@
                 {% if allmodules.Bank_account != Null %}
                 <div class="position-relative">
                   <div class="position-absolute end-0 bottom-0" style="z-index: 1;margin-bottom: -1.6em;margin-right: 0rem;">
-                    <a style="color: black;" href=""><span class="fs-5 fa fa-plus-circle"></span></a>
+                    <a style="color: black;" href="{% url 'bank_create' %}"><span class="fs-5 fa fa-plus-circle"></span></a>
                   </div>
                 </div>
-                  <a href="" class="d-flex align-items-center gap-2 dropdown-item">
+                  <a href="{% url 'banks_list' 0 %}" class="d-flex align-items-center gap-2 dropdown-item">
                     <!-- <i class="ti ti-mail fs-6"></i> -->
                     <p class="mb-0 fs-3">Bank Accounts</p>
                   </a>

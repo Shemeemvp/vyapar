@@ -138,7 +138,7 @@ class TransactionModel(models.Model):
     trans_status = models.CharField(max_length=255)
     trans_created_date = models.DateTimeField(auto_now_add=True,null=True)
 
-# ========================= ASHIKH V U (END)===========================
+
 class BankModel(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
     company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
@@ -153,7 +153,8 @@ class BankModel(models.Model):
     current_balance = models.BigIntegerField(null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=255,null=True)
-
+    
+    
 class BankTransactionModel(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
     company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
@@ -168,7 +169,8 @@ class BankTransactionModel(models.Model):
     current_amount = models.BigIntegerField(default=0)
     last_action = models.CharField(max_length=255,null=True)
     by = models.CharField(max_length=255,null=True) 
-
+    
+    
 class BankTransactionHistory(models.Model):
     staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
     company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
@@ -176,9 +178,54 @@ class BankTransactionHistory(models.Model):
     bank_trans = models.ForeignKey(BankTransactionModel,on_delete=models.CASCADE,blank=True,null=True)
     date = models.DateField(auto_now_add=True,null=True)
     action = models.CharField(max_length=255)
-    done_by = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
+    done_by = models.ForeignKey(staff_details,related_name='done_by_staff',on_delete=models.CASCADE,blank=True,null=True)
     done_by_name = models.CharField(max_length=255)
 
+# ========================= ASHIKH V U (END)===========================
+
+class PurchaseBill(models.Model):
+    billno = models.AutoField(('BILLID'), primary_key=True)
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,null=True,blank=True)
+    company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
+    party = models.ForeignKey(party, on_delete=models.CASCADE)
+    billdate = models.DateField()
+    supplyplace = models.CharField(max_length=100, default='')
+    pay_method = models.CharField(max_length=255, default='', null=True)
+    cheque_no = models.CharField(max_length=255, default='', null=True)
+    upi_no = models.CharField(max_length=255, default='', null=True)
+    subtotal = models.IntegerField(default=0, null=True)
+    igst = models.CharField(max_length=100,default=0, null=True)
+    cgst = models.CharField(max_length=100,default=0, null=True)
+    sgst = models.CharField(max_length=100,default=0, null=True)
+    taxamount = models.CharField(max_length=100,default=0, null=True)
+    adjust = models.CharField(max_length=100,default=0, null=True)
+    grandtotal = models.FloatField(default=0, null=True)
+    advance=models.CharField(null=True,blank=True,max_length=255)
+    balance=models.CharField(null=True,blank=True,max_length=255)
+    tot_bill_no = models.IntegerField(default=0, null=True)
+
+class PurchaseBillItem(models.Model):
+    purchasebill = models.ForeignKey(PurchaseBill,on_delete=models.CASCADE)
+    company = models.ForeignKey(company,on_delete=models.CASCADE)
+    product = models.ForeignKey(ItemModel,on_delete=models.CASCADE)
+    qty = models.IntegerField(default=0, null=True)
+    total = models.IntegerField(default=0, null=True)
+    tax = models.CharField(max_length=100)
+    discount = models.CharField(max_length=100,default=0, null=True)
+    
+    
+class PurchaseBillTransactionHistory(models.Model):
+    purchasebill = models.ForeignKey(PurchaseBill,on_delete=models.CASCADE)
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,null=True,blank=True)
+    company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
+    CHOICES = [
+        ('Created', 'Created'),
+        ('Updated', 'Updated'),
+    ]
+    action = models.CharField(max_length=20, choices=CHOICES)
+    transactiondate = models.DateField(auto_now=True)
+    
+    
 # ==============delivery challan & Estimate ============shemeem --start=======
 
 class Estimate(models.Model):
