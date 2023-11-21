@@ -783,6 +783,42 @@
         });
     });
 
+    function refreshPartyDetails(){
+        $.ajax({
+            url: "{% url 'getPartyDetails' %}", 
+            data: { 
+                id: $('#party').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            type : 'POST',
+            success: function(data) {
+                // $("#party_address").addClass('d-block');
+                // $("#party_contact").addClass('d-block');
+                // $("#party_balance").addClass('d-block');
+                // $("#party_address").removeClass('d-none');
+                // $("#party_contact").removeClass('d-none');
+                // $("#party_balance").removeClass('d-none');
+
+                var json_data = JSON.parse(data);
+                for (key in json_data) {
+                    document.getElementById('bill_address').value = json_data[key]['address'];
+                    $('#p_contact').val(json_data[key]['contact']);
+                    $('#p_state').val(json_data[key]['state']);
+                    if (json_data[key]['payment'] == 'To Pay'){
+                        $('#p_bal').css('color','red');
+                        $('#p_bal').text(json_data[key]['balance']);
+                    }else if (json_data[key]['payment'] == 'To Receive'){
+                        $('#p_bal').css('color','green');
+                        $('#p_bal').text(json_data[key]['balance']);
+                    }
+                    else{
+                        $('#p_bal').css('color','black');
+                        $('#p_bal').text(json_data[key]['balance']);
+                    }
+                }
+            }
+        });
+    }
     $(function(){
         $("#igst_val").css('display','none');
     })
@@ -825,7 +861,7 @@
     $(document).on("click", "#saveParty", function(){
         $.ajax({
             type : 'POST',
-            url:"{% url 'save_parties' %}",
+            url:"{% url 'addNewParty' %}",
             data:{
                 csrfmiddlewaretoken: '{{ csrf_token }}',
                 partyname : $('#partyname').val(),
@@ -883,6 +919,7 @@
             }
             
         });
+        refreshPartyDetails();
     }
 
 
@@ -1200,7 +1237,7 @@
     $(document).on("click", "#saveItem", function(){
         $.ajax({
             type : 'POST',
-            url:"{% url 'item_create_new' %}",
+            url:"{% url 'addNewItem' %}",
             data:{
                 csrfmiddlewaretoken: '{{ csrf_token }}',
                 item_name : $('#item_name').val(),

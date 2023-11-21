@@ -1857,7 +1857,7 @@ def updateEstimate(request, id):
         )
         history.save()
 
-        return redirect(estimate_quotation)
+        return redirect(viewEstimate,id)
     except Exception as e:
       print(e)
       return redirect(editEstimate, id)
@@ -2360,7 +2360,7 @@ def updateChallan(request, id):
         )
         history.save()
 
-        return redirect(delivery_challan)
+        return redirect(viewChallan,id)
     except Exception as e:
       print(e)
       return redirect(editChallan, id)
@@ -2833,7 +2833,139 @@ def challanBillPdf(request,id):
     return response
 
 
+def viewEstimate(request, id):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+            
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    com =  company.objects.get(id = staff.company.id)
+    allmodules= modules_list.objects.get(company=com.id,status='New')
+    try:
+      bill = Estimate.objects.get(company = com, id = id)
+      items = Estimate_items.objects.filter(company = com , eid = bill)
+      context= {
+        'staff':staff, 'company':com, 'bill':bill, 'items': items,'allmodules':allmodules
+      }
+      return render(request, 'staff/view_estimate.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(estimate_quotation)
+    
+
+def viewChallan(request, id):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+            
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    com =  company.objects.get(id = staff.company.id)
+    allmodules= modules_list.objects.get(company=com.id,status='New')
+    try:
+      bill = DeliveryChallan.objects.get(company = com, id = id)
+      items = DeliveryChallanItems.objects.filter(company = com , cid = bill)
+      context= {
+        'staff':staff, 'company':com, 'bill':bill, 'items': items,'allmodules':allmodules
+      }
+      return render(request, 'staff/view_challan.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(delivery_challan)
+    
+
+def addNewParty(request):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+            
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+
+    if request.method == 'POST':
+      Company = company.objects.get(id = staff.company.id)
+      user_id = request.user.id
+      
+      party_name = request.POST['partyname']
+      gst_no = request.POST['gstno']
+      contact = request.POST['contact']
+      gst_type = request.POST['gst']
+      state = request.POST['state']
+      address = request.POST['address']
+      email = request.POST['email']
+      openingbalance = request.POST.get('balance', '')
+      payment = request.POST.get('paymentType', '')
+      creditlimit = request.POST.get('creditlimit', '')
+      current_date = request.POST['currentdate']
+      End_date = request.POST.get('enddate', None)
+      additionalfield1 = request.POST['additionalfield1']
+      additionalfield2 = request.POST['additionalfield2']
+      additionalfield3 = request.POST['additionalfield3']
+      comp=Company
+      if (not party_name):
+        return render(request, 'add_parties.html')
+
+      part = party(party_name=party_name, gst_no=gst_no,contact=contact,gst_type=gst_type, state=state,address=address, email=email, openingbalance=openingbalance,payment=payment,
+                      creditlimit=creditlimit,current_date=current_date,End_date=End_date,additionalfield1=additionalfield1,additionalfield2=additionalfield2,additionalfield3=additionalfield3,company=comp)
+      part.save()
+
+      return JsonResponse({'status':True})
 
 
+def addNewItem(request):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+            
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    com =  company.objects.get(id = staff.company.id)
+
+    if request.method=='POST':
+      company_user_data = com
+      item_name = request.POST.get('item_name')
+      item_hsn = request.POST.get('item_hsn')
+      item_unit = request.POST.get('item_unit')
+      item_taxable = request.POST.get('item_taxable')
+      item_gst = request.POST.get('item_gst')
+      item_igst = request.POST.get('item_igst')
+      item_sale_price = request.POST.get('item_sale_price')
+      item_purchase_price = request.POST.get('item_purchase_price')
+      item_opening_stock = request.POST.get('item_opening_stock')
+      item_current_stock = item_opening_stock
+      if item_opening_stock == '' or None :
+        item_opening_stock = 0
+        item_current_stock = 0
+      item_at_price = request.POST.get('item_at_price')
+      if item_at_price == '' or None:
+        item_at_price =0
+      item_date = request.POST.get('item_date')
+      item_min_stock_maintain = request.POST.get('item_min_stock_maintain')
+      if item_min_stock_maintain == ''  or None:
+        item_min_stock_maintain = 0
+      item_data = ItemModel(company=company_user_data,
+        item_name=item_name,
+        item_hsn=item_hsn,
+        item_unit=item_unit,
+        item_taxable=item_taxable,
+        item_gst=item_gst,
+        item_igst=item_igst,
+        item_sale_price=item_sale_price,
+        item_purchase_price=item_purchase_price,
+        item_opening_stock=item_opening_stock,
+        item_current_stock=item_current_stock,
+        item_at_price=item_at_price,
+        item_date=item_date,
+        item_min_stock_maintain=item_min_stock_maintain
+      )
+      item_data.save()
+
+      return JsonResponse({'status':True})
+    
 
 # ===================end ---shemeem =============================

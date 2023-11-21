@@ -119,6 +119,8 @@ urlpatterns = [
 
     # =========== estimate & delivery challan=========== shemeem - start =======================================
     path('create_estimate',views.create_estimate, name='create_estimate'),
+    path('add_new_party',views.addNewParty, name='addNewParty'),
+    path('add_new_item',views.addNewItem, name='addNewItem'),
     path('get_party_details',views.getPartyDetails, name='getPartyDetails'),
     path('get_item_data',views.getItemData, name='getItemData'),
     path('create_new_estimate',views.createNewEstimate, name='createNewEstimate'),
@@ -138,6 +140,7 @@ urlpatterns = [
     path('import_estimate_form_excel',views.importEstimateFromExcel, name='importEstimateFromExcel'),
     path('download_estimate_sample_file',views.downloadEstimateSampleImportFile, name = 'downloadEstimateSampleImportFile'),
     path('estimate_bill_pdf_view/<int:id>',views.estimateBillPdf, name='estimateBillPdf'),
+    path('view_estimate_bill/<int:id>',views.viewEstimate, name='viewEstimate'),
 
 
     path('create_delivery_challan',views.createDeliveryChallan, name='createDeliveryChallan'),
@@ -157,9 +160,10 @@ urlpatterns = [
     path('import_challan_form_excel',views.importChallanFromExcel, name='importChallanFromExcel'),
     path('download_challan_sample_file',views.downloadChallanSampleImportFile, name = 'downloadChallanSampleImportFile'),
     path('challan_bill_pdf_view/<int:id>',views.challanBillPdf, name='challanBillPdf'),
+    path('view_challan_bill/<int:id>',views.viewChallan, name='viewChallan'),
 
 
-    # ===================================== shemeem - end ================================================== 
+    # ===================================== shemeem - end ==================================================
     
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
     

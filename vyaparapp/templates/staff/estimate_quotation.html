@@ -356,7 +356,7 @@
                                             <span class="fa fa-ellipsis-v text-dark fs-1"></span>
                                         </button>
                                         <ul class="dropdown-menu">
-                                          <li><button type="button" class="dropdown-item fw-bold" hx-get="#"><span class="fa fa-eye me-2 text-success"></span> View</button></li>
+                                          <li><button type="button" class="dropdown-item fw-bold" onclick="window.location.href=`{% url 'viewEstimate' i.estimate.id %}`"><span class="fa fa-eye me-2 text-success"></span> View</button></li>
                                           <li><button type="button" class="dropdown-item fw-bold" onclick="window.location.href=`{% url 'editEstimate' i.estimate.id %}`"><span class="fas fa-pencil-alt me-2 text-info"></span> Edit</button></li>
                                           <li><button type="button" onclick="deleteEstimate(`{{i.estimate.id}}`)" class="dropdown-item fw-bold" href=""><span class="fa fa-trash-alt me-2 text-danger"></span> Delete</button></li>
                                           <li><button type="button" onclick="window.location.href= `{% url 'estimateTransactionHistory' i.estimate.id %}`" class="dropdown-item fw-bold"><span class="fa fa-history me-2 text-info"></span> Transaction History</button></li>
@@ -491,7 +491,7 @@
             if (willDelete) {
             window.location.href = "{% url 'deleteEstimate' 0 %}".replace('0', parseInt(id));
             } else {
-                swal({ icon: "success", text: "Operation Aborted!" });
+                // swal({ icon: "success", text: "Operation Aborted!" });
             }
         });
     }
