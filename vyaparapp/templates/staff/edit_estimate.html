@@ -918,7 +918,7 @@
     $(document).on("click", "#saveParty", function(){
         $.ajax({
             type : 'POST',
-            url:"{% url 'addnewParty' %}",
+            url:"{% url 'addNewParty' %}",
             data:{
                 csrfmiddlewaretoken: '{{ csrf_token }}',
                 partyname : $('#partyname').val(),

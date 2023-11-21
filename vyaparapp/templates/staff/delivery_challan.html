@@ -167,7 +167,7 @@
         </div>
         <div class="dc_date_between mt-2">
             <div class="filtr_with_date_between d-flex d-inline align-items-center h-100">
-                <form action="{% url 'challanInBetween' %}" method="get" class="d-flex d-inline">
+                <form action="{% url 'challanInBetween' %}" method="get" class="d-flex d-inline" onsubmit="return validateDates()">
                     <div class="text-center fw-bold text-dark d-flex align-items-center px-1" style="background-color: #cbf3ff;">BETWEEN</div>
                     <input type="date" name="from_date" id="from_date_value" class="form-control form-control-sm" required>
                     <label for="" class="mx-1 py-1">to</label>
@@ -197,15 +197,15 @@
                     </div>
                     <div class="option_btn d-flex align-items-center">
                         <!-- <button class="btn btn-sm btn-outline-secondary me-2" onclick="window.location.href=`{% url 'create_estimate' %}`"><i class="fa fa-plus me-1"></i>ESTIMATE</button> -->
-                        <button class="btn btn-sm" type="button" onclick="printSection('print_export_section')" title="PRINT"><span><img width="22px" src="{% static 'assets/printer1.png' %}" alt="no img"></span></button>
+                        <button class="btn btn-sm" type="button" onclick="printSection('print_export_section')" title="PRINT"><span><img width="22px" src="{% static 'assets/printer1.png' %}" alt="PRINT"></span></button>
                         <!-- <form id="myForm" action="{% url 'importChallanFromExcel' %}" method="POST" class="p-0 m-0 " enctype="multipart/form-data">
                             {% csrf_token %}
                             <input id="excel_file" hidden type="file" name="excel_file">
                             <label for="excel_file" class="btn p-1 ps-1 pe-1 m-0" type="button" title="IMPORT"><span><img draggable="false" width="22px" src="{% static 'assets/excel02.png' %}" alt="no img"></span></label>
                             <input id="submit_import_excel" hidden type="submit">
                         </form> -->
-                        <button class="btn btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#importChallan" title="EXPORT"><span><img width="22px" src="{% static 'assets/excel02.png' %}" alt="no img"></span></button>
-                        <button class="btn btn-sm" type="button" onclick="exportToExcel()" title="EXPORT"><span><img width="22px" src="{% static 'assets/excel2.png' %}" alt="no img"></span></button>
+                        <button class="btn btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#importChallan" title="IMPORT"><span><img width="22px" src="{% static 'images/import.png' %}" alt="IMPORT"></span></button>
+                        <button class="btn btn-sm" type="button" onclick="exportToExcel()" title="EXPORT"><span><img width="22px" src="{% static 'assets/excel2.png' %}" alt="EXPORT"></span></button>
                     </div>
                 </div>
             </div>
@@ -521,6 +521,17 @@
             $('#submit_import_excel').click()
         })
     })
+
+    function validateDates() {
+      var fromDate = new Date(document.getElementById('from_date_value').value);
+      var toDate = new Date(document.getElementById('to_date_value').value);
+
+      if (toDate < fromDate) {
+        alert('To date must be greater than or equal to From date');
+        return false;
+      }
+      return true;
+    }
 </script>
 
 {%if messages%} {%for message in messages%} {%if message.tags == "success"%}

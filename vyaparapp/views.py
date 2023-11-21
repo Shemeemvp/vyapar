@@ -1535,11 +1535,17 @@ def estimateFilterWithDate(request):
     try:
       date = request.GET['date_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      estimates = Estimate.objects.filter(company = com, date = date)
+      all_estimates = Estimate.objects.filter(company = com, date = date)
+      estimates = []
+      for est in all_estimates:
+        history = EstimateTransactionHistory.objects.filter(company = com, estimate = est).last()
+        dict = {'estimate':est,'history':history}
+        estimates.append(dict)      
       
-      if not estimates:
+      if not all_estimates:
         messages.warning(request, f'No Estimates found on {date}.!')
-        estimates = Estimate.objects.filter(company = com)
+        # estimates = Estimate.objects.filter(company = com)
+        return redirect(estimate_quotation)
       
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
@@ -1562,11 +1568,17 @@ def estimateFilterWithRef(request):
     try:
       ref = request.GET['ref_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      estimates = Estimate.objects.filter(company = com, ref_no = ref)
-      
-      if not estimates:
+      all_estimates = Estimate.objects.filter(company = com, ref_no = ref)
+      estimates = []
+      for est in all_estimates:
+        history = EstimateTransactionHistory.objects.filter(company = com, estimate = est).last()
+        dict = {'estimate':est,'history':history}
+        estimates.append(dict)
+
+      if not all_estimates:
         messages.warning(request, f'No Estimates found with Ref No. {ref}.!')
-        estimates = Estimate.objects.filter(company = com)
+        # estimates = Estimate.objects.filter(company = com)
+        return redirect(estimate_quotation)
       
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
@@ -1589,11 +1601,17 @@ def estimateFilterWithBal(request):
     try:
       bal = request.GET['bal_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      estimates = Estimate.objects.filter(company = com, balance = bal)
+      all_estimates = Estimate.objects.filter(company = com, balance = bal)
+      estimates = []
+      for est in all_estimates:
+        history = EstimateTransactionHistory.objects.filter(company = com, estimate = est).last()
+        dict = {'estimate':est,'history':history}
+        estimates.append(dict)
 
-      if not estimates:
+      if not all_estimates:
         messages.warning(request, f'No Estimates found with Balance amount {bal}.!')
-        estimates = Estimate.objects.filter(company = com)
+        # estimates = Estimate.objects.filter(company = com)
+        return redirect(estimate_quotation)
       
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
@@ -1616,11 +1634,17 @@ def estimateFilterWithName(request):
     try:
       name = request.GET['name_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      estimates = Estimate.objects.filter(company = com, party_name = name)
+      all_estimates = Estimate.objects.filter(company = com, party_name = name)
+      estimates = []
+      for est in all_estimates:
+        history = EstimateTransactionHistory.objects.filter(company = com, estimate = est).last()
+        dict = {'estimate':est,'history':history}
+        estimates.append(dict)      
 
-      if not estimates:
+      if not all_estimates:
         messages.warning(request, f'No Estimates found with Party Name {name}.!')
-        estimates = Estimate.objects.filter(company = com)
+        # estimates = Estimate.objects.filter(company = com)
+        return redirect(estimate_quotation)
       
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
@@ -1643,11 +1667,17 @@ def estimateFilterWithTotal(request):
     try:
       tot = request.GET['total_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      estimates = Estimate.objects.filter(company = com, total_amount = tot)
+      all_estimates = Estimate.objects.filter(company = com, total_amount = tot)
+      estimates = []
+      for est in all_estimates:
+        history = EstimateTransactionHistory.objects.filter(company = com, estimate = est).last()
+        dict = {'estimate':est,'history':history}
+        estimates.append(dict)
 
-      if not estimates:
+      if not all_estimates:
         messages.warning(request, f'No Estimates found with Total Amount {tot}.!')
-        estimates = Estimate.objects.filter(company = com)
+        # estimates = Estimate.objects.filter(company = com)
+        return redirect(estimate_quotation)
 
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
@@ -1670,11 +1700,17 @@ def estimateFilterWithStat(request):
     try:
       stat = request.GET['status']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      estimates = Estimate.objects.filter(company = com, status = stat)
+      all_estimates = Estimate.objects.filter(company = com, status = stat)
+      estimates = []
+      for est in all_estimates:
+        history = EstimateTransactionHistory.objects.filter(company = com, estimate = est).last()
+        dict = {'estimate':est,'history':history}
+        estimates.append(dict)
 
-      if not estimates:
+      if not all_estimates:
         messages.warning(request, f'No Estimates found with Status {stat}.!')
-        estimates = Estimate.objects.filter(company = com)
+        # estimates = Estimate.objects.filter(company = com)
+        return redirect(estimate_quotation)
       
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
@@ -1699,11 +1735,17 @@ def estimateInBetween(request):
       fromDate = request.GET['from_date']
       toDate = request.GET['to_date']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      estimates = Estimate.objects.filter(company = com).filter(date__gte = fromDate, date__lte = toDate)
+      all_estimates = Estimate.objects.filter(company = com).filter(date__gte = fromDate, date__lte = toDate)
+      estimates = []
+      for est in all_estimates:
+        history = EstimateTransactionHistory.objects.filter(company = com, estimate = est).last()
+        dict = {'estimate':est,'history':history}
+        estimates.append(dict)
       
-      if not estimates:
+      if not all_estimates:
         messages.warning(request, f'No Estimates found in between {fromDate} to {toDate}.!')
-        estimates = Estimate.objects.filter(company = com)
+        # estimates = Estimate.objects.filter(company = com)
+        return redirect(estimate_quotation)      
       
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
@@ -2011,11 +2053,16 @@ def challanInBetween(request):
       fromDate = request.GET['from_date']
       toDate = request.GET['to_date']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      challan = DeliveryChallan.objects.filter(company = com).filter(date__gte = fromDate, date__lte = toDate)
-      
-      if not challan:
+      all_challan = DeliveryChallan.objects.filter(company = com).filter(date__gte = fromDate, date__lte = toDate)
+      challan = []
+      for dc in all_challan:
+        history = DeliveryChallanTransactionHistory.objects.filter(company = com, challan = dc).last()
+        dict = {'challan':dc,'history':history}
+        challan.append(dict)
+      if not all_challan:
         messages.warning(request, f'No Challans found in between {fromDate} to {toDate}.!')
-        challan = DeliveryChallan.objects.filter(company = com)
+        # challan = DeliveryChallan.objects.filter(company = com)
+        return redirect(delivery_challan)
       
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
@@ -2038,11 +2085,16 @@ def challanFilterWithDate(request):
     try:
       date = request.GET['date_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      challan = DeliveryChallan.objects.filter(company = com, date = date)
-      
-      if not challan:
+      all_challan = DeliveryChallan.objects.filter(company = com, date = date)
+      challan = []
+      for dc in all_challan:
+        history = DeliveryChallanTransactionHistory.objects.filter(company = com, challan = dc).last()
+        dict = {'challan':dc,'history':history}
+        challan.append(dict)
+      if not all_challan:
         messages.warning(request, f'No Challans found on {date}.!')
-        challan = DeliveryChallan.objects.filter(company = com)
+        # challan = DeliveryChallan.objects.filter(company = com)
+        return redirect(delivery_challan)
       
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
@@ -2065,11 +2117,17 @@ def challanFilterWithDueDate(request):
     try:
       date = request.GET['due_date_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      challan = DeliveryChallan.objects.filter(company = com, due_date = date)
-      
-      if not challan:
+      all_challan = DeliveryChallan.objects.filter(company = com, due_date = date)
+      challan = []
+      for dc in all_challan:
+        history = DeliveryChallanTransactionHistory.objects.filter(company = com, challan = dc).last()
+        dict = {'challan':dc,'history':history}
+        challan.append(dict)
+
+      if not all_challan:
         messages.warning(request, f'No Challans found with Due Date {date}.!')
-        challan = DeliveryChallan.objects.filter(company = com)
+        # challan = DeliveryChallan.objects.filter(company = com)
+        return redirect(delivery_challan)
       
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
@@ -2092,11 +2150,17 @@ def challanFilterWithChallanNo(request):
     try:
       chl = request.GET['challan_no_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      challan = DeliveryChallan.objects.filter(company = com, challan_no = chl)
-      
-      if not challan:
+      all_challan = DeliveryChallan.objects.filter(company = com, challan_no = chl)
+      challan = []
+      for dc in all_challan:
+        history = DeliveryChallanTransactionHistory.objects.filter(company = com, challan = dc).last()
+        dict = {'challan':dc,'history':history}
+        challan.append(dict)
+
+      if not all_challan:
         messages.warning(request, f'No Challans found with Challan No. {chl}.!')
-        challan = DeliveryChallan.objects.filter(company = com)
+        # challan = DeliveryChallan.objects.filter(company = com)
+        return redirect(delivery_challan)
       
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
@@ -2119,11 +2183,17 @@ def challanFilterWithBal(request):
     try:
       bal = request.GET['bal_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      challan = DeliveryChallan.objects.filter(company = com, balance = bal)
+      all_challan = DeliveryChallan.objects.filter(company = com, balance = bal)
+      challan = []
+      for dc in all_challan:
+        history = DeliveryChallanTransactionHistory.objects.filter(company = com, challan = dc).last()
+        dict = {'challan':dc,'history':history}
+        challan.append(dict)
 
-      if not challan:
+      if not all_challan:
         messages.warning(request, f'No Challans found with Balance amount {bal}.!')
-        challan = DeliveryChallan.objects.filter(company = com)
+        # challan = DeliveryChallan.objects.filter(company = com)
+        return redirect(delivery_challan)
       
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
@@ -2146,11 +2216,17 @@ def challanFilterWithName(request):
     try:
       name = request.GET['name_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      challan = DeliveryChallan.objects.filter(company = com, party_name = name)
+      all_challan = DeliveryChallan.objects.filter(company = com, party_name = name)
+      challan = []
+      for dc in all_challan:
+        history = DeliveryChallanTransactionHistory.objects.filter(company = com, challan = dc).last()
+        dict = {'challan':dc,'history':history}
+        challan.append(dict)
 
-      if not challan:
+      if not all_challan:
         messages.warning(request, f'No Challans found with Party Name {name}.!')
-        challan = DeliveryChallan.objects.filter(company = com)
+        # challan = DeliveryChallan.objects.filter(company = com)
+        return redirect(delivery_challan)
       
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
@@ -2173,11 +2249,17 @@ def challanFilterWithTotal(request):
     try:
       tot = request.GET['total_filter_value']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      challan = DeliveryChallan.objects.filter(company = com, total_amount = tot)
+      all_challan = DeliveryChallan.objects.filter(company = com, total_amount = tot)
+      challan = []
+      for dc in all_challan:
+        history = DeliveryChallanTransactionHistory.objects.filter(company = com, challan = dc).last()
+        dict = {'challan':dc,'history':history}
+        challan.append(dict)
 
-      if not challan:
+      if not all_challan:
         messages.warning(request, f'No Challans found with Total Amount {tot}.!')
-        challan = DeliveryChallan.objects.filter(company = com)
+        # challan = DeliveryChallan.objects.filter(company = com)
+        return redirect(delivery_challan)
 
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
@@ -2200,11 +2282,17 @@ def challanFilterWithStat(request):
     try:
       stat = request.GET['status']
       allmodules= modules_list.objects.get(company=com.id,status='New')
-      challan = DeliveryChallan.objects.filter(company = com, status = stat)
-
-      if not challan:
+      all_challan = DeliveryChallan.objects.filter(company = com, status = stat)
+      challan = []
+      for dc in all_challan:
+        history = DeliveryChallanTransactionHistory.objects.filter(company = com, challan = dc).last()
+        dict = {'challan':dc,'history':history}
+        challan.append(dict)
+        
+      if not all_challan:
         messages.warning(request, f'No Challans found with Status {stat}.!')
-        challan = DeliveryChallan.objects.filter(company = com)
+        # challan = DeliveryChallan.objects.filter(company = com)
+        return redirect(delivery_challan)
       
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
