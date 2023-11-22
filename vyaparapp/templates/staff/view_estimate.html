@@ -322,7 +322,7 @@
                                         <div class="mt-4">
                                             <p class="text-muted mt-2 mb-0" style="color: #000;">Party Name: <span style="float: right;"><b>{{bill.party_name}}</b></span></p>
                                             <p class="text-muted mb-0" style="color: #000;">Contact: <span style="float: right;"><b>{{bill.contact}}</b></span></p>
-                                            <p class="text-muted mb-0" style="color: #000;">Billing Address: <span style="float: right;"><b>{{bill.billing_address}}</b></span></p>
+                                            {%if bill.billing_address != "" %}<p class="text-muted mb-0" style="color: #000;">Billing Address: <span style="float: right;"><b>{{bill.billing_address}}</b></span></p>{% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -370,8 +370,26 @@
                                                     <td style="color: #000;">:</td>
                                                     <td class="text-center" style="color: #000;">{{bill.subtotal}}</td>
                                                 </tr>
+                                                {% if bill.state_of_supply != "State" %}
                                                 <tr >
-                                                    <td style="color: #000;">Tax</td>
+                                                    <td style="color: #000;">IGST</td>
+                                                    <td style="color: #000;">:</td>
+                                                    <td class="text-center" style="color: #000;">{{bill.igst}}</td>
+                                                </tr>
+                                                {% else %}
+                                                <tr >
+                                                    <td style="color: #000;">CGST</td>
+                                                    <td style="color: #000;">:</td>
+                                                    <td class="text-center" style="color: #000;">{{bill.cgst}}</td>
+                                                </tr>
+                                                <tr >
+                                                    <td style="color: #000;">SGST</td>
+                                                    <td style="color: #000;">:</td>
+                                                    <td class="text-center" style="color: #000;">{{bill.sgst}}</td>
+                                                </tr>
+                                                {% endif %}
+                                                <tr >
+                                                    <td style="color: #000;">Tax Amount</td>
                                                     <td style="color: #000;">:</td>
                                                     <td class="text-center" style="color: #000;">{{bill.tax_amount}}</td>
                                                 </tr>
@@ -443,7 +461,7 @@
                                         <div class="mt-4">
                                             <p class="mt-2 mb-0" style="color: #000;">Party Name: <span style="float: right;"><b>{{bill.party_name}}</b></span></p>
                                             <p class="mb-0" style="color: #000;">Contact: <span style="float: right;"><b>{{bill.contact}}</b></span></p>
-                                            <p class="mb-0" style="color: #000;">Billing Address: <span style="float: right;"><b>{{bill.billing_address}}</b></span></p>
+                                            {%if bill.billing_address != "" %}<p class="text-muted mb-0" style="color: #000;">Billing Address: <span style="float: right;"><b>{{bill.billing_address}}</b></span></p>{% endif %}
                                             <p class="mb-0" style="color: #000;">State Of Supply: <span style="float: right;"><b>{{bill.state_of_supply}}</b></span></p>
                                         </div>
                                     </div>
@@ -594,7 +612,7 @@
                                         <div class="mt-4">
                                             <p class="text-muted mt-2 mb-0" style="color: #000;">Party Name: <span style="float: right;"><b>{{bill.party_name}}</b></span></p>
                                             <p class="text-muted mb-0" style="color: #000;">Contact: <span style="float: right;"><b>{{bill.contact}}</b></span></p>
-                                            <p class="text-muted mb-0" style="color: #000;">Billing Address: <span style="float: right;"><b>{{bill.billing_address}}</b></span></p>
+                                            {%if bill.billing_address != "" %}<p class="text-muted mb-0" style="color: #000;">Billing Address: <span style="float: right;"><b>{{bill.billing_address}}</b></span></p>{% endif %}
                                             <p class="text-muted mb-0" style="color: #000;">State Of Supply: <span style="float: right;"><b>{{bill.state_of_supply}}</b></span></p>
                                         </div>
                                     </div>

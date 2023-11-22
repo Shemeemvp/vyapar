@@ -169,9 +169,9 @@
             <div class="filtr_with_date_between d-flex d-inline align-items-center h-100">
                 <form action="{% url 'challanInBetween' %}" method="get" class="d-flex d-inline" onsubmit="return validateDates()">
                     <div class="text-center fw-bold text-dark d-flex align-items-center px-1" style="background-color: #cbf3ff;">BETWEEN</div>
-                    <input type="date" name="from_date" id="from_date_value" class="form-control form-control-sm" required>
+                    <input type="date" value="{{from}}" name="from_date" id="from_date_value" class="form-control form-control-sm" required>
                     <label for="" class="mx-1 py-1">to</label>
-                    <input type="date" name="to_date" id="to_date_value" class="form-control form-control-sm" required>
+                    <input type="date" value="{{to}}" name="to_date" id="to_date_value" class="form-control form-control-sm" required>
                     <input type="submit" value="FILTER" class="btn btn-sm btn-info ms-1" id="dc_date_btwn_filt_sub_btn"> 
                 </form>
             </div>
@@ -223,8 +223,8 @@
                                             <select name="date_filter" id="date_filter_condition" class="form-control form-control-sm">
                                                 <option value="equals_to">Equals To</option>
                                             </select>
-                                            <input type="date" name="date_filter_value" class="form-control form-control-sm mt-1" required>
-                                            <input type="reset" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
+                                            <input type="date" value="{{date_value}}" name="date_filter_value" class="form-control form-control-sm mt-1" required>
+                                            <input type="button" onclick="window.location.href=`{% url 'delivery_challan' %}`" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
                                             <input type="submit" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="APPLY" />
                                         </form>
                                     </div>
@@ -240,8 +240,8 @@
                                             <select name="name_filter" id="name_filter_condition" class="form-control form-control-sm">
                                                 <option value="equals_to">Equals To</option>
                                             </select>
-                                            <input type="text" name="name_filter_value" placeholder="Name" class="form-control form-control-sm mt-1" required>
-                                            <input type="reset" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
+                                            <input type="text" value="{{name_value}}" name="name_filter_value" placeholder="Name" class="form-control form-control-sm mt-1" required>
+                                            <input type="button" onclick="window.location.href=`{% url 'delivery_challan' %}`" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
                                             <input type="submit" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="APPLY" />
                                         </form>
                                     </div>
@@ -257,8 +257,8 @@
                                             <select name="chalan_no_filter" id="chalan_no_filter_condition" class="form-control form-control-sm">
                                                 <option value="equals_to">Equals To</option>
                                             </select>
-                                            <input type="text" name="challan_no_filter_value" placeholder="Challan No." class="form-control form-control-sm mt-1" required>
-                                            <input type="reset" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
+                                            <input type="text" value="{{chno_value}}" name="challan_no_filter_value" placeholder="Challan No." class="form-control form-control-sm mt-1" required>
+                                            <input type="button" onclick="window.location.href=`{% url 'delivery_challan' %}`" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
                                             <input type="submit" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="APPLY" />
                                         </form>
                                     </div>
@@ -274,8 +274,8 @@
                                             <select name="name_filter" id="name_filter_condition" class="form-control form-control-sm">
                                                 <option value="equals_to">Equals To</option>
                                             </select>
-                                            <input type="date" name="due_date_filter_value" class="form-control form-control-sm mt-1" required>
-                                            <input type="reset" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
+                                            <input type="date" value="{{duedate_value}}" name="due_date_filter_value" class="form-control form-control-sm mt-1" required>
+                                            <input type="button" onclick="window.location.href=`{% url 'delivery_challan' %}`" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
                                             <input type="submit" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="APPLY" />
                                         </form>
                                     </div>
@@ -291,8 +291,8 @@
                                             <select name="total_filter" id="total_filter_condition" class="form-control form-control-sm">
                                                 <option value="equals_to">Equals To</option>
                                             </select>
-                                            <input type="text" name="total_filter_value" placeholder="Total" class="form-control form-control-sm mt-1" required>
-                                            <input type="reset" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
+                                            <input type="text" value="{{total_value}}" name="total_filter_value" placeholder="Total" class="form-control form-control-sm mt-1" required>
+                                            <input type="button" onclick="window.location.href=`{% url 'delivery_challan' %}`" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
                                             <input type="submit" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="APPLY" />
                                         </form>
                                     </div>
@@ -308,8 +308,8 @@
                                             <select name="bal_filter" id="bal_filter_condition" class="form-control form-control-sm">
                                                 <option value="equals_to">Equals To</option>
                                             </select>
-                                            <input type="text" name="bal_filter_value" placeholder="Balance" class="form-control form-control-sm mt-1" required>
-                                            <input type="reset" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
+                                            <input type="text" value="{{bal_value}}" name="bal_filter_value" placeholder="Balance" class="form-control form-control-sm mt-1" required>
+                                            <input type="button" onclick="window.location.href=`{% url 'delivery_challan' %}`" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
                                             <input type="submit" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="APPLY" />
                                         </form>
                                     </div>
@@ -333,7 +333,7 @@
                                                 <input class="form-check-input" type="radio" name="status" value="Completed" id="completed_stat_radio">
                                                 <label class="form-check-label" for="completed_stat_radio">Completed</label>
                                             </div>
-                                            <input type="reset" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
+                                            <input type="button" onclick="window.location.href=`{% url 'delivery_challan' %}`" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="CLEAR" />
                                             <input type="submit" class="btn btn-sm btn-info mt-1" style="width: 49%;" value="APPLY" />
                                         </form>
                                     </div>

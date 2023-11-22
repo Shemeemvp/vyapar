@@ -3068,7 +3068,7 @@ def estimateFilterWithDate(request):
         return redirect(estimate_quotation)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'date_value':date,
       }
       return render(request, 'staff/estimate_quotation.html',context)
     except Exception as e:
@@ -3101,7 +3101,7 @@ def estimateFilterWithRef(request):
         return redirect(estimate_quotation)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'ref_value':ref,
       }
       return render(request, 'staff/estimate_quotation.html',context)
     except Exception as e:
@@ -3134,7 +3134,7 @@ def estimateFilterWithBal(request):
         return redirect(estimate_quotation)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'bal_value':bal,
       }
       return render(request, 'staff/estimate_quotation.html',context)
     except Exception as e:
@@ -3167,7 +3167,7 @@ def estimateFilterWithName(request):
         return redirect(estimate_quotation)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'name_value':name,
       }
       return render(request, 'staff/estimate_quotation.html',context)
     except Exception as e:
@@ -3200,7 +3200,7 @@ def estimateFilterWithTotal(request):
         return redirect(estimate_quotation)
 
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'total_value':tot,
       }
       return render(request, 'staff/estimate_quotation.html',context)
     except Exception as e:
@@ -3233,7 +3233,7 @@ def estimateFilterWithStat(request):
         return redirect(estimate_quotation)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'stat_value':stat,
       }
       return render(request, 'staff/estimate_quotation.html',context)
     except Exception as e:
@@ -3268,7 +3268,7 @@ def estimateInBetween(request):
         return redirect(estimate_quotation)      
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'from':fromDate, 'to':toDate,
       }
       return render(request, 'staff/estimate_quotation.html',context)
     except Exception as e:
@@ -3585,7 +3585,7 @@ def challanInBetween(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'from':fromDate, 'to':toDate,
       }
       return render(request, 'staff/delivery_challan.html',context)
     except Exception as e:
@@ -3617,7 +3617,7 @@ def challanFilterWithDate(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'date_value':date
       }
       return render(request, 'staff/delivery_challan.html',context)
     except Exception as e:
@@ -3650,7 +3650,7 @@ def challanFilterWithDueDate(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'duedate_value':date,
       }
       return render(request, 'staff/delivery_challan.html',context)
     except Exception as e:
@@ -3683,7 +3683,7 @@ def challanFilterWithChallanNo(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'chno_value':chl,
       }
       return render(request, 'staff/delivery_challan.html',context)
     except Exception as e:
@@ -3716,7 +3716,7 @@ def challanFilterWithBal(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'bal_value':bal,
       }
       return render(request, 'staff/delivery_challan.html',context)
     except Exception as e:
@@ -3749,7 +3749,7 @@ def challanFilterWithName(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'name_value':name,
       }
       return render(request, 'staff/delivery_challan.html',context)
     except Exception as e:
@@ -3782,7 +3782,7 @@ def challanFilterWithTotal(request):
         return redirect(delivery_challan)
 
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'total_value':tot,
       }
       return render(request, 'staff/delivery_challan.html',context)
     except Exception as e:
@@ -3815,7 +3815,7 @@ def challanFilterWithStat(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'stat_value':stat,
       }
       return render(request, 'staff/delivery_challan.html',context)
     except Exception as e:
