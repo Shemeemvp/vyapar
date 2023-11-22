@@ -295,7 +295,7 @@
                     <div class="billsToPrint" id="billsToPrint" style="display: block;">
 
                         <!-- Template 1 -->
-                        <div  id="printBill1" class="printTemplates template1">
+                        <div  id="printBill1" class="printTemplates template1" style="display: block;">
                             <div class="page bg-white px-3 py-2" >
                                 <div class="row px-3 py-4" style="background-color: #575757;">
                                     <div id="es_status1" class="col-md-4 d-flex justify-content-start"></div>
@@ -418,14 +418,25 @@
                                     <div class="col-md-4 d-flex justify-content-end">
                                         <div class="text-white">
                                             <p class="mb-0">BILL # <b>{{bill.challan_no }}</b></p>
-                                            <p class="mb-0">Date: <b>{{ bill.date | date:'d-m-Y' }}</b></p>
-                                            <p class="mb-0">Due Date: <b>{{ bill.due_date | date:'d-m-Y' }}</b></p>
+                                            <!-- <p class="mb-0">Date: <b>{{ bill.date | date:'d-m-Y' }}</b></p>
+                                            <p class="mb-0">Due Date: <b>{{ bill.due_date | date:'d-m-Y' }}</b></p> -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-4 d-flex justify-content-end pt-2">
+                                        <div class="challan_dates">
+                                            <p class="mb-0">Date: <b class="float-end ms-2">{{ bill.date | date:'d-m-Y' }}</b></p>
+                                            <p class="mb-0">Due Date: <b class="ms-2">{{ bill.due_date | date:'d-m-Y' }}</b></p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row mt-5 px-2">
                                     <div class="col-md-6">
-                                        <h4 class="" style="font-weight: bold; color: #505763;">{{company.company_name }}</h4>
+                                        <h3 class="fw-bolder" style="color: #b3b0ae;">Company Details</h3>
+                                        <h4 class="mt-4" style="font-weight: bold; color: #505763;">{{company.company_name }}</h4>
                                         <p class="address" style="font-weight: normal; color: #000;"> {{company.address}}<br>
                                             {{company.state}} - {{company.country}}<br>
                                             {{company.user.email}}<br>
@@ -433,11 +444,12 @@
                                         </p>
                                     </div>
                                     <div class="col-md-6">
+                                        <h3 class="fw-bolder" style="color: #b3b0ae;">Party Details</h3>
                                         <div class="mt-4">
-                                            <p class="text-muted mt-2 mb-0" style="color: #000;">Party Name: <span style="float: right;"><b>{{bill.party_name}}</b></span></p>
-                                            <p class="text-muted mb-0" style="color: #000;">Contact: <span style="float: right;"><b>{{bill.contact}}</b></span></p>
-                                            <p class="text-muted mb-0" style="color: #000;">Billing Address: <span style="float: right;"><b>{{bill.billing_address}}</b></span></p>
-                                            <p class="text-muted mb-0" style="color: #000;">State Of Supply: <span style="float: right;"><b>{{bill.state_of_supply}}</b></span></p>
+                                            <p class="mt-2 mb-0" style="color: #000;">Party Name: <span style="float: right;"><b>{{bill.party_name}}</b></span></p>
+                                            <p class="mb-0" style="color: #000;">Contact: <span style="float: right;"><b>{{bill.contact}}</b></span></p>
+                                            <p class="mb-0" style="color: #000;">Billing Address: <span style="float: right;"><b>{{bill.billing_address}}</b></span></p>
+                                            <p class="mb-0" style="color: #000;">State Of Supply: <span style="float: right;"><b>{{bill.state_of_supply}}</b></span></p>
                                         </div>
                                     </div>
                                 </div>
@@ -541,32 +553,53 @@
                         <!-- Template 3 -->
                         <div  id="printBill3" class="printTemplates template3" style="display: none;">
                             <div class="page bg-white px-3 py-2" >
-                                <div class="row px-3 py-4">
+                                <div class="row px-3 pt-4 pb-0">
                                     <div id="es_status3" class="col-md-4 d-flex justify-content-start align-items-center">
                                         <span class="p-2 px-4 fw-bolder" style="background-color: #3dd9eb; color: white;">{{bill.status}}</span>
                                     </div>
                                     <div class="col-md-4 d-flex justify-content-center align-items-center bill_header">
-                                        <center class="h4 text-dark"><b>DELIVERY CHALLAN</b></center>
+                                        <!-- <center class="h4 text-dark"><b>DELIVERY CHALLAN</b></center> -->
+                                        <center class="">
+                                            <h4 class="text-secondary" style="font-weight: bold;">{{company.company_name }}</h4>
+                                            <p class="address" style="font-weight: normal; color: #000;"> {{company.address}}<br>
+                                                {{company.state}} - {{company.country}}<br>
+                                                {{company.user.email}}<br>
+                                                {{company.contact}}<br>
+                                            </p>
+                                        </center>
                                     </div>
                                     <div class="col-md-4 d-flex justify-content-end">
-                                        <div class="text-dark">
+                                        <!-- <div class="text-dark">
                                             <p class="mb-0">BILL # <b>{{bill.challan_no }}</b></p>
                                             <p class="mb-0">Date: <b>{{ bill.date | date:'d-m-Y' }}</b></p>
                                             <p class="mb-0">Due Date: <b>{{ bill.due_date | date:'d-m-Y' }}</b></p>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                                 <hr>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="text-dark d-flex justify-content-between">
+                                            <p class="mb-0">BILL # <b>{{bill.challan_no }}</b></p>
+                                            <div class="challan_dates">
+                                                <p class="mb-0">Date: <b>{{ bill.date | date:'d-m-Y' }}</b></p>
+                                                <p class="mb-0">Due Date: <b>{{ bill.due_date | date:'d-m-Y' }}</b></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <center class="h4 text-primary mt-3"><b>DELIVERY CHALLAN</b></center>
                                 <div class="row mt-5 px-2">
-                                    <div class="col-md-6">
+                                    <!-- <div class="col-md-6">
                                         <h4 class="text-secondary" style="font-weight: bold;">{{company.company_name }}</h4>
                                         <p class="address" style="font-weight: normal; color: #000;"> {{company.address}}<br>
                                             {{company.state}} - {{company.country}}<br>
                                             {{company.user.email}}<br>
                                             {{company.contact}}<br>
                                         </p>
-                                    </div>
-                                    <div class="col-md-6">
+                                    </div> -->
+                                    <div class="col-md-12">
+                                        <h3 class="fw-bolder" style="color: #b3b0ae;">Party Details</h3>
                                         <div class="mt-4">
                                             <p class="text-muted mt-2 mb-0" style="color: #000;">Party Name: <span style="float: right;"><b>{{bill.party_name}}</b></span></p>
                                             <p class="text-muted mb-0" style="color: #000;">Contact: <span style="float: right;"><b>{{bill.contact}}</b></span></p>
@@ -753,9 +786,13 @@
                                     <span><strong><span>&#8377; </span>{{bill.total_amount}}</strong></span>
                                 </div>
                                 <div class="divider"></div>
-                                <div class="paid-by mb-4 d-flex justify-content-between">
+                                <div class="paid-by mb-1 d-flex justify-content-between">
                                     <span>Paid By:</span>
                                     <span>Credit</span>
+                                </div>
+                                <div class="created-by mb-4 d-flex justify-content-between">
+                                    <span>Created By:</span>
+                                    <span>{{bill.staff.first_name}} {{bill.staff.last_name}}</span>
                                 </div>
                                 <div class="datetime d-flex justify-content-start">
                                     <p class="">{% now "d/m/Y g:i A" %}</p>

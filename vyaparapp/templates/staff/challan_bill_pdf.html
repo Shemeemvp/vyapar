@@ -190,7 +190,7 @@
                     <td style="font-weight: bold" id="igst">{{bill.tax_amount}}</td>
                 </tr>
 
-                {% if bill.adjustment != 0.0 %}
+                {% if bill.adjustment != None and bill.adjustment != 0.0 %}
                 <tr id="adjstrow">
                   <th colspan="3">
                     <span style="float: right; margin-right: 10px"

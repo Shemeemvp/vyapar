@@ -1045,6 +1045,7 @@
                     </td>
                 </tr>`
             )
+            reloadItems();
         });
     });
 
@@ -1059,6 +1060,9 @@
                 var qty = $(this).find('.qty').val();                
                 var price = $(this).find('.price').val();
                 var disc = $(this).find('.discount').val();
+                if (disc == ""){
+                    disc = 0
+                }
                 if($('#state_of_supply').val() == 'state'){
                     var tax_percentage = $(this).find('.tax-gst').val();
                 }else if($('#state_of_supply').val() == 'other'){

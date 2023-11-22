@@ -2922,7 +2922,8 @@ def getItemData(request):
     try:
         id = request.GET.get('id')
 
-        item = ItemModel.objects.get(item_name = id, company = com)
+        # item = ItemModel.objects.get(item_name = id, company = com)
+        item = ItemModel.objects.filter(item_name = id, company = com).first()
         hsn = item.item_hsn
         pur_rate = item.item_purchase_price
         sale_rate = item.item_sale_price
