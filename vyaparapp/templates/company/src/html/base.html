@@ -165,9 +165,13 @@
                 <hr>
                   {% endif %}
                   {% if allmodules.Estimate != Null %}
-                  <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                  <a href="{% url 'estimate_quotation' %}" class="d-flex align-items-center gap-2 dropdown-item">
                     <!-- <i class="ti ti-mail fs-6"></i> -->
-                    <p class="mb-0 fs-3">Estimate/ Quotation</p>
+                    
+                    <div class="d-flex">
+                      <p class="mb-0 fs-3">Estimate/ Quotation</p>
+                      <a href="{% url 'create_estimate' %}"><i class="fa fa-plus text-dark" ></i></a>
+                    </div>
                   </a>
                   <hr>
                   {% endif %}
@@ -186,9 +190,12 @@
                   <hr>
                   {% endif %}
                   {% if allmodules.Delivery_challan != Null %}
-                  <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                  <a href="{% url 'delivery_challan' %}" class="d-flex align-items-center gap-2 dropdown-item">
                     <!-- <i class="ti ti-mail fs-6"></i> -->
-                    <p class="mb-0 fs-3">Delivery Challan</p>
+                    <div class="d-flex">
+                      <p class="mb-0 fs-3">Delivery Challan</p>
+                      <a href="{% url 'createDeliveryChallan' %}"><i class="fa fa-plus text-dark" ></i></a>
+                    </div>
                   </a>
                   <hr>
                   {% endif %}

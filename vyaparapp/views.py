@@ -104,7 +104,7 @@ def estimate_quotation(request):
     context = {
       'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
     }
-    return render(request, 'staff/estimate_quotation.html',context)
+    return render(request, 'company/estimate_quotation.html',context)
 
 def payment_in(request):
   return render(request, 'payment_in.html')
@@ -2504,7 +2504,7 @@ def delivery_challan(request):
     context = {
       'staff':staff, 'company':com,'allmodules':allmodules, 'challan':challan,
     }
-    return render(request, 'staff/delivery_challan.html',context)
+    return render(request, 'company/delivery_challan.html',context)
     
 
 def create_estimate(request):
@@ -2538,12 +2538,11 @@ def create_estimate(request):
           if deleted:
               while int(deleted.ref_no) >= new_number:
                   new_number+=1
-
       
       context = {
         'staff':staff, 'company':com,'allmodules':allmodules, 'parties':parties, 'ref_no':new_number,'items':items,'item_units':item_units,
       }
-      return render(request, 'staff/create_estimate.html',context)
+      return render(request, 'company/create_estimate.html',context)
     except Exception as e:
       print(e)
       return redirect(estimate_quotation)
@@ -2731,9 +2730,9 @@ def estimateFilterWithDate(request):
         return redirect(estimate_quotation)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'date_value':date,
       }
-      return render(request, 'staff/estimate_quotation.html',context)
+      return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
       return redirect(estimate_quotation)
@@ -2764,9 +2763,9 @@ def estimateFilterWithRef(request):
         return redirect(estimate_quotation)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'ref_value':ref,
       }
-      return render(request, 'staff/estimate_quotation.html',context)
+      return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
       return redirect(estimate_quotation)
@@ -2797,9 +2796,9 @@ def estimateFilterWithBal(request):
         return redirect(estimate_quotation)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'bal_value':bal,
       }
-      return render(request, 'staff/estimate_quotation.html',context)
+      return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
       return redirect(estimate_quotation)
@@ -2830,9 +2829,9 @@ def estimateFilterWithName(request):
         return redirect(estimate_quotation)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'name_value':name,
       }
-      return render(request, 'staff/estimate_quotation.html',context)
+      return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
       return redirect(estimate_quotation)
@@ -2863,9 +2862,9 @@ def estimateFilterWithTotal(request):
         return redirect(estimate_quotation)
 
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'total_value':tot,
       }
-      return render(request, 'staff/estimate_quotation.html',context)
+      return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
       return redirect(estimate_quotation)
@@ -2896,9 +2895,9 @@ def estimateFilterWithStat(request):
         return redirect(estimate_quotation)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'stat_value':stat,
       }
-      return render(request, 'staff/estimate_quotation.html',context)
+      return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
       return redirect(estimate_quotation)
@@ -2931,9 +2930,9 @@ def estimateInBetween(request):
         return redirect(estimate_quotation)      
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,
+        'staff':staff,'company':com,'allmodules':allmodules, 'estimates':estimates,'from':fromDate, 'to':toDate,
       }
-      return render(request, 'staff/estimate_quotation.html',context)
+      return render(request, 'company/estimate_quotation.html',context)
     except Exception as e:
       print(e)
       return redirect(estimate_quotation)
@@ -2994,7 +2993,7 @@ def editEstimate(request, id):
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'parties':parties,'items':items,'item_units':item_units, 'estimate':est, 'estItems':est_items,
       }
-      return render(request, 'staff/edit_estimate.html',context)
+      return render(request, 'company/edit_estimate.html',context)
     except Exception as e:
       print(e)
       return redirect(estimate_quotation)
@@ -3104,7 +3103,7 @@ def estimateTransactionHistory(request,id):
       context = {
         'staff':staff, 'company':com,'allmodules':allmodules,'history':history,
       }
-      return render(request, 'staff/estimate_transaction_history.html',context)
+      return render(request, 'company/estimate_transaction_history.html',context)
     except Exception as e:
       print(e)
       return redirect(estimate_quotation)
@@ -3148,7 +3147,7 @@ def createDeliveryChallan(request):
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'parties':parties, 'challan_no':new_number,'items':items,'item_units':item_units,
       }
-      return render(request, 'staff/create_delivery_challan.html',context)
+      return render(request, 'company/create_delivery_challan.html',context)
     except Exception as e:
       print(e)
       return redirect(delivery_challan)
@@ -3248,9 +3247,9 @@ def challanInBetween(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'from':fromDate, 'to':toDate,
       }
-      return render(request, 'staff/delivery_challan.html',context)
+      return render(request, 'company/delivery_challan.html',context)
     except Exception as e:
       print(e)
       return redirect(delivery_challan)
@@ -3280,9 +3279,9 @@ def challanFilterWithDate(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'date_value':date,
       }
-      return render(request, 'staff/delivery_challan.html',context)
+      return render(request, 'company/delivery_challan.html',context)
     except Exception as e:
       print(e)
       return redirect(delivery_challan)
@@ -3313,9 +3312,9 @@ def challanFilterWithDueDate(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'duedate_value':date,
       }
-      return render(request, 'staff/delivery_challan.html',context)
+      return render(request, 'company/delivery_challan.html',context)
     except Exception as e:
       print(e)
       return redirect(delivery_challan)
@@ -3346,9 +3345,9 @@ def challanFilterWithChallanNo(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'chno_value':chl,
       }
-      return render(request, 'staff/delivery_challan.html',context)
+      return render(request, 'company/delivery_challan.html',context)
     except Exception as e:
       print(e)
       return redirect(delivery_challan)
@@ -3379,9 +3378,9 @@ def challanFilterWithBal(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'bal_value':bal,
       }
-      return render(request, 'staff/delivery_challan.html',context)
+      return render(request, 'company/delivery_challan.html',context)
     except Exception as e:
       print(e)
       return redirect(delivery_challan)
@@ -3412,9 +3411,9 @@ def challanFilterWithName(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'name_value':name,
       }
-      return render(request, 'staff/delivery_challan.html',context)
+      return render(request, 'company/delivery_challan.html',context)
     except Exception as e:
       print(e)
       return redirect(delivery_challan)
@@ -3445,9 +3444,9 @@ def challanFilterWithTotal(request):
         return redirect(delivery_challan)
 
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'total_value':tot,
       }
-      return render(request, 'staff/delivery_challan.html',context)
+      return render(request, 'company/delivery_challan.html',context)
     except Exception as e:
       print(e)
       return redirect(delivery_challan)
@@ -3478,9 +3477,9 @@ def challanFilterWithStat(request):
         return redirect(delivery_challan)
       
       context = {
-        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,
+        'staff':staff,'company':com,'allmodules':allmodules, 'challan':challan,'stat_value':stat,
       }
-      return render(request, 'staff/delivery_challan.html',context)
+      return render(request, 'company/delivery_challan.html',context)
     except Exception as e:
       print(e)
       return redirect(delivery_challan)
@@ -3541,7 +3540,7 @@ def editChallan(request, id):
       context = {
         'staff':staff,'company':com,'allmodules':allmodules, 'parties':parties,'items':items,'item_units':item_units, 'challan':dc, 'dcItems':dc_items,
       }
-      return render(request, 'staff/edit_delivery_challan.html',context)
+      return render(request, 'company/edit_delivery_challan.html',context)
     except Exception as e:
       print(e)
       return redirect(delivery_challan)
@@ -3653,7 +3652,7 @@ def challanTransactionHistory(request,id):
       context = {
         'staff':staff, 'company':com, 'allmodules':allmodules, 'history':history,
       }
-      return render(request, 'staff/delivery_challan_transaction_history.html',context)
+      return render(request, 'company/delivery_challan_transaction_history.html',context)
     except Exception as e:
       print(e)
       return redirect(delivery_challan)
@@ -3725,6 +3724,7 @@ def importEstimateFromExcel(request):
             return redirect(estimate_quotation)
         
         # getting data from estimate sheet and create estimate.
+        incorrect_data = []
         ws = wb['estimate']
         for row in ws.iter_rows(min_row=2, values_only=True):
           slno,date,name,state_of_supply,description,subtotal,igst,cgst,sgst,taxamount,adjustment,grandtotal = row
@@ -3747,6 +3747,9 @@ def importEstimateFromExcel(request):
               if deleted:
                   while int(deleted.ref_no) >= new_number:
                       new_number+=1
+          if not party.objects.filter(company = com, party_name = name).exists():
+            incorrect_data.append(slno)
+            continue
           try:
             cntct = party.objects.get(company = com, party_name = name).contact
             adrs = party.objects.get(company = com, party_name = name).address
@@ -3804,12 +3807,17 @@ def importEstimateFromExcel(request):
                 discount=0
               if price is None:
                 price=0
+              if not ItemModel.objects.filter(company = com, item_name = name).exists():
+                incorrect_data.append(est_no)
+                continue
               try:
                 itm = ItemModel.objects.get(company = com, item_name = name)
               except:
                 pass
               Estimate_items.objects.create(staff = staff, eid = estimate, company = com, item = itm,name = name,hsn=hsn,quantity=int(quantity),price = float(price),tax=tx, discount = float(discount),total=float(total))
     messages.success(request, 'Data imported successfully.!')
+    if incorrect_data:
+      messages.warning(request, f'Data with following SlNo could not import due to incorrect data provided - {", ".join(str(item) for item in incorrect_data)}')
     return redirect(estimate_quotation)
   
 
@@ -3879,6 +3887,7 @@ def importChallanFromExcel(request):
             return redirect(delivery_challan)
         
         # getting data from estimate sheet and create estimate.
+        incorrect_data = []
         ws = wb['challan']
         for row in ws.iter_rows(min_row=2, values_only=True):
           slno,date,due_date,name,state_of_supply,description,subtotal,igst,cgst,sgst,taxamount,adjustment,grandtotal = row
@@ -3901,6 +3910,9 @@ def importChallanFromExcel(request):
               if deleted:
                   while int(deleted.challan_no) >= new_number:
                       new_number+=1
+          if not party.objects.filter(company = com, party_name = name).exists():
+            incorrect_data.append(slno)
+            continue
           try:
             cntct = party.objects.get(company = com, party_name = name).contact
             adrs = party.objects.get(company = com, party_name = name).address
@@ -3962,12 +3974,17 @@ def importChallanFromExcel(request):
                 discount=0
               if price is None:
                 price=0
+              if not ItemModel.objects.filter(company = com, item_name = name).exists():
+                incorrect_data.append(chl_no)
+                continue
               try:
                 itm = ItemModel.objects.get(company = com, item_name = name)
               except:
                 pass
               DeliveryChallanItems.objects.create(staff = staff, cid = challan, company = com, item = itm,name = name,hsn=hsn,quantity=int(quantity),price = float(price),tax=tx, discount = float(discount),total=float(total))
     messages.success(request, 'Data imported successfully.!')
+    if incorrect_data:
+      messages.warning(request, f'Data with following SlNo could not import due to incorrect data provided - {", ".join(str(item) for item in incorrect_data)}')
     return redirect(delivery_challan)
 
 
@@ -4046,7 +4063,7 @@ def estimateBillPdf(request,id):
     
     context = {'staff':staff,'bill': bill, 'company': com,'items':items, 'total':words_total}
     
-    template_path = 'staff/estimate_bill_pdf.html'
+    template_path = 'company/estimate_bill_pdf.html'
     fname = 'bill'+str(bill.ref_no)
 
     # return render(request, 'staff/estimate_bill_pdf.html',context)
@@ -4084,7 +4101,7 @@ def challanBillPdf(request,id):
     
     context = {'staff':staff,'bill': bill, 'company': com,'items':items, 'total':words_total}
     
-    template_path = 'staff/challan_bill_pdf.html'
+    template_path = 'company/challan_bill_pdf.html'
     fname = 'bill'+str(bill.challan_no)
 
     # return render(request, 'staff/challan_bill_pdf.html',context)
@@ -4120,7 +4137,7 @@ def viewEstimate(request, id):
       context= {
         'staff':staff, 'company':com, 'bill':bill, 'items': items,'allmodules':allmodules
       }
-      return render(request, 'staff/view_estimate.html',context)
+      return render(request, 'company/view_estimate.html',context)
     except Exception as e:
       print(e)
       return redirect(estimate_quotation)
@@ -4142,7 +4159,7 @@ def viewChallan(request, id):
       context= {
         'staff':staff, 'company':com, 'bill':bill, 'items': items,'allmodules':allmodules
       }
-      return render(request, 'staff/view_challan.html',context)
+      return render(request, 'company/view_challan.html',context)
     except Exception as e:
       print(e)
       return redirect(delivery_challan)
