@@ -17,12 +17,12 @@ urlpatterns = [
     path('sale_invoices', views.sale_invoices, name='sale_invoices'),
     path('estimate_quotation', views.estimate_quotation, name='estimate_quotation'),
     path('payment_in', views.payment_in, name='payment_in'),
-    path('sale_order', views.sale_order, name='sale_order'),
+    # path('sale_order', views.sale_order, name='sale_order'),
     path('delivery_challan', views.delivery_challan, name='delivery_challan'),
     path('sale_return_cr', views.sale_return_cr, name='sale_return_cr'),
 
     # created by athul
-    path('settings', views.settings, name='settings'),
+    # path('settings', views.settings, name='settings'),
     path('hide_options', views.hide_options, name='hide_options'),
 
     path('staffhome', views.staffhome, name='staffhome'),
@@ -62,9 +62,9 @@ urlpatterns = [
     path('admin_notification', views.admin_notification, name='admin_notification'),
     path('module_updation_details/<mid>', views.module_updation_details, name='module_updation_details'),
     path('module_updation_ok/<mid>', views.module_updation_ok, name='module_updation_ok'),
-    path('staff_profile/<sid>', views.staff_profile, name='staff_profile'),
-    path('editstaff_profile/<sid>', views.editstaff_profile, name='editstaff_profile'),
-    path('editstaff_profile_action/<sid>', views.editstaff_profile_action, name='editstaff_profile_action'),
+    path('staff_profile', views.staff_profile, name='staff_profile'),
+    path('editstaff_profile', views.editstaff_profile, name='editstaff_profile'),
+    path('editstaff_profile_action', views.editstaff_profile_action, name='editstaff_profile_action'),
 
     path('distributor_home', views.distributor_home, name='distributor_home'),
     path('distributor_reg', views.distributor_reg, name='distributor_reg'),
@@ -206,9 +206,98 @@ urlpatterns = [
     path('download_challan_sample_file',views.downloadChallanSampleImportFile, name = 'downloadChallanSampleImportFile'),
     path('challan_bill_pdf_view/<int:id>',views.challanBillPdf, name='challanBillPdf'),
     path('view_challan_bill/<int:id>',views.viewChallan, name='viewChallan'),
-
-
     # ===================================== shemeem - end ==================================================
+    
+    #______________Sales Invoice_________________Antony Tom___________________________
+    path('itemdetailinvoice', views.itemdetailinvoice, name='itemdetailinvoice'),
+    path('add_salesinvoice', views.add_salesinvoice, name='add_salesinvoice'),
+    path('save_sales_invoice', views.save_sales_invoice, name='save_sales_invoice'),
+    path('itemdata_salesinvoice',views.itemdata_salesinvoice,name='itemdata_salesinvoice'),
+    path('itemdata_salesinvoiceedit',views.itemdata_salesinvoiceedit,name='itemdata_salesinvoiceedit'),
+    path('view_salesinvoice',views.view_salesinvoice,name='view_salesinvoice'),
+    path('api/bank-details/<str:bank_name>/',views.get_bank_details, name='get_bank_details'),
+    path('get_total_balance/', views.get_total_balance, name='get_total_balance'),
+    path('edit_salesinvoice/<int:id>/', views.edit_salesinvoice, name='edit_salesinvoice'),
+    path('editsave_salesinvoice/<int:id>/', views.editsave_salesinvoice, name='editsave_salesinvoice'),
+    path('salesinvoice_save_parties', views.salesinvoice_save_parties, name='salesinvoice_save_parties'),
+    path('deletesalesinvoice/<int:id>/', views.deletesalesinvoice, name='deletesalesinvoice'),
+    path('graph_salesinvoice', views.graph_salesinvoice, name='graph_salesinvoice'),
+    path('salesinvoicehistory/<int:id>/', views.salesinvoicehistory, name='salesinvoicehistory'),
+    path('salesinvoice_billtemplate/<int:id>/', views.salesinvoice_billtemplate, name='salesinvoice_billtemplate'),
+    path('importsalesinvoice_excel', views.importsalesinvoice_excel, name='importsalesinvoice_excel'),
+    path('api/profit_loss_data/', views.profit_loss_data, name='profit_loss_data'),
+    path('api/party-details/<str:party_name>/',views.party_details, name='party_details'),
+    #End
+    
+    # ========================================   Haripriya B Nair (start) ======================================================
+    path('view_purchasedebit',views.view_purchasedebit,name='view_purchasedebit'),
+    path('add_debitnote',views.add_debitnote,name='add_debitnote'),
+    path('custdata1',views.custdata1,name='custdata1'),
+    path('cust_dropdown1',views.cust_dropdown1,name='cust_dropdown1'),
+    path('savecustomer1',views.savecustomer1,name='savecustomer1'),
+    path('saveitem1',views.saveitem1,name='saveitem1'),
+    path('item_dropdowns',views.item_dropdowns,name='item_dropdowns'),
+    path('itemdetail',views.itemdetail,name='itemdetail'),
+    path('create_debitnotes',views.create_debitnotes,name='create_debitnotes'),
+    path('purchasebilldata',views.purchasebilldata,name='purchasebilldata'),
+    path('purchasebilldatas',views.purchasebilldatas,name='purchasebilldatas'),
+    path('bankdata1',views.bankdata1,name='bankdata1'),
+    path('delete_debit/<int:id>',views.delete_debit,name='delete_debit'),
+    path('edit_debitnote/<int:id>',views.edit_debitnote,name='edit_debitnote'),
+    path('update_debitnote/<int:id>',views.update_debitnote,name='update_debitnote'),
+    path('history_debitnote/<int:id>',views.history_debitnote,name='history_debitnote'),
+    path('debthistory',views.debthistory,name='debthistory'),
+    path('import_debitnote',views.import_debitnote,name='import_debitnote'),
+    path('details_debitnote/<int:id>',views.details_debitnote,name='details_debitnote'),
+
+# ========================================   Haripriya B Nair (end) =============
+
+    path('sharedebitToEmail/<int:id>',views.sharedebitToEmail,name='sharedebitToEmail'),
+    
+    path('distributor_notification',views.distributor_notification,name='distributor_notification'),
+    path('distributor_module_updation/<int:mid>',views.distributor_module_updation,name='distributor_module_updation'),
+    path('distributor_module_updation_ok/<int:mid>',views.distributor_module_updation_ok,name='distributor_module_updation_ok'),
+    path('expense',views.expense,name='expense'),
+    path('newexpenses',views.newexpenses,name='newexpenses'),
+    path('partydata',views.partydata,name='partydata'),
+    path('add_party_in_expense',views.add_party_in_expense,name='add_party_in_expense'),
+    path('create_expense_category',views.create_expense_category,name='create_expense_category'),
+    path('create_expense',views.create_expense,name='create_expense'),
+    path('view_expense/<int:eid>',views.view_expense,name='view_expense'),
+    path('expense_details/<int:eid>',views.expense_details,name='expense_details'),
+    path('edit_expense/<int:eid>',views.edit_expense,name='edit_expense'),
+    path('edit_expense_action/<int:eid>',views.edit_expense_action,name='edit_expense_action'),
+    path('delete_expense/<int:eid>',views.delete_expense,name='delete_expense'),
+    path('view_expense/import_expense',views.import_expense,name='import_expense'),
+    
+    path('create_purchaseorder',views.create_purchaseorder,name='create_purchaseorder'),
+    path('edit_purchaseorder/<int:id>',views.edit_purchaseorder,name='edit_purchaseorder'),
+    path('update_purchaseorder/<int:id>',views.update_purchaseorder,name='update_purchaseorder'),
+    path('details_purchaseorder/<int:id>',views.details_purchaseorder,name='details_purchaseorder'),
+    path('delete_purchaseorder/<int:id>',views.delete_purchaseorder,name='delete_purchaseorder'),
+    path('orderhistory',views.orderhistory,name='orderhistory'), 
+    path('convert_to_bill/<int:id>',views.convert_to_bill,name='convert_to_bill'),
+    path('import_purchase_order',views.import_purchase_order,name='import_purchase_order'),  
+    path('history_purchaseorder/<int:id>',views.history_purchaseorder,name='history_purchaseorder'), 
+    
+    #Nsaneen
+    path('sale_order', views.sale_order, name='sale_order'),
+    path('saleorder_create', views.saleorder_create, name='saleorder_create'),
+    path('getparty', views.getparty, name='getparty'),
+    path('getproduct', views.getproduct, name='getproduct'),
+    path('getacc', views.getacc, name='getacc'),
+    path('create_saleorder', views.create_saleorder, name='create_saleorder'),
+    path('saleorder_view/<int:id>', views.saleorder_view, name='saleorder_view'),
+    path('delete_saleorder/<int:id>', views.delete_saleorder, name='delete_saleorder'),
+    path('import_excel', views.import_excel, name='import_excel'),
+    path('add_party', views.add_party, name='add_party'),
+    path('add_item', views.add_item, name='add_item'),
+    path('sales_transaction/<int:id>', views.sales_transaction, name='sales_transaction'),
+    path('saleorder_edit/<int:id>', views.saleorder_edit, name='saleorder_edit'),
+    path('edit_saleorder/<int:id>', views.edit_saleorder, name='edit_saleorder'),
+    path('saleorderto_invoice/<int:id>', views.saleorderto_invoice, name='saleorderto_invoice'),
+    path('saleorder_convert/<int:sid>', views.saleorder_convert, name='saleorder_convert'),
+    #End
     
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
     

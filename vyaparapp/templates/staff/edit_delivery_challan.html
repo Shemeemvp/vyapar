@@ -487,7 +487,7 @@
                                           <option value="GST3[3%]">GST3[3%]</option>
                                           <option value="GST5[5%]">GST5[5%]</option>
                                           <option value="GST12[12%]">GST12[12%]</option>
-                                          <option value="GST18[18%]">GST18[18%]</option>
+                                          <option value="GST13[18%]">GST18[18%]</option>
                                           <option value="GST28[28%]">GST28[28%]</option>
                                         </select>
                                       </div>
@@ -817,9 +817,6 @@
                     var json_data = JSON.parse(data);
                     for (key in json_data) {
                         document.getElementById('bill_address').value = json_data[key]['address'];
-                        if (json_data[key]['address'] == ""){
-                            $("#party_address").addClass('d-none');
-                        }
                         $('#p_contact').val(json_data[key]['contact']);
                         $('#p_state').val(json_data[key]['state']);
                         if (json_data[key]['payment'] == 'To Pay'){
@@ -858,9 +855,6 @@
                 var json_data = JSON.parse(data);
                 for (key in json_data) {
                     document.getElementById('bill_address').value = json_data[key]['address'];
-                    if (json_data[key]['address'] == ""){
-                        $("#party_address").addClass('d-none');
-                    }
                     $('#p_contact').val(json_data[key]['contact']);
                     $('#p_state').val(json_data[key]['state']);
                     if (json_data[key]['payment'] == 'To Pay'){

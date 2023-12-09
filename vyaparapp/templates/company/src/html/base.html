@@ -18,6 +18,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
   <style>
     a {
@@ -67,13 +70,23 @@
           <ul id="sidebarnav ">
 
             <li class="sidebar-item mt-3">
-              <a class="sidebar-link " href="{% url 'homepage' %}" aria-expanded="false"
+              {% if staff.position == 'company' %}
+                <a class="sidebar-link " href="{% url 'homepage' %}" aria-expanded="false"
                 style="text-decoration: none; color: black; background-color: rgb(210, 235, 241,0.5);">
                 <b style="margin-left: 10px;"><i class="ti ti-layout-dashboard"></i></b>
                 </span>
                 <span class="hide-menu"><b>Dashboard</b></span>
-              </a>
+                </a>
+              {% else %}
+                <a class="sidebar-link " href="{% url 'staffhome' %}" aria-expanded="false"
+                style="text-decoration: none; color: black; background-color: rgb(210, 235, 241,0.5);">
+                <b style="margin-left: 10px;"><i class="ti ti-layout-dashboard"></i></b>
+                </span>
+                <span class="hide-menu"><b>Dashboard</b></span>
+                </a>
+              {% endif %}
             </li>
+            {% if staff.position == 'company' %}
             <li class="sidebar-item">
               <button class="btn dropdown-btn" style="margin-top: 10px; border: none;outline: none; color: black;background-color: rgb(210, 235, 241,0.5);width: 100%;text-align: left;">
                 <span>
@@ -99,6 +112,7 @@
               
               
             </li>
+            {% endif %}
             
             <li class="sidebar-item" style="display: flex; justify-content: space-between;">
               <a class="sidebar-link mt-2" href="{% url 'view_parties' %}" aria-expanded="false"
@@ -141,11 +155,14 @@
               </button>
               <div class="dropdown-container" style="background-color: aliceblue;padding: 20px;justify-content: center;">
                 {% if allmodules.sales_invoice != Null %}
-                  <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                    <!-- <i class="ti ti-mail fs-6"></i> -->
-                    <p class="mb-0 fs-3">Sale Invoices</p>
-                  </a>
-                  <hr>
+                <a href="{% url 'view_salesinvoice' %}" class="d-flex align-items-center gap-2 dropdown-item">
+                  <!-- <i class="ti ti-mail fs-6"></i> -->
+                  <div class="d-flex">
+                    <p class="mb-0 fs-3">Sales Invoice</p>
+                    <a href="{% url 'add_salesinvoice' %}"><i class="fa fa-plus text-dark" ></i></a>
+                  </div>
+                </a>
+                <hr>
                   {% endif %}
                   {% if allmodules.Estimate != Null %}
                   <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
@@ -162,7 +179,7 @@
                   <hr>
                   {% endif %}
                   {% if allmodules.sales_order != Null %}
-                  <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                  <a href="{% url 'sale_order' %}" class="d-flex align-items-center gap-2 dropdown-item">
                     <!-- <i class="ti ti-user fs-6"></i> -->
                     <p class="mb-0 fs-3">Sale Order</p>
                   </a>
@@ -202,11 +219,14 @@
               </button>
               <div class="dropdown-container" style="background-color: aliceblue;padding: 20px;justify-content: center;">
                 {% if allmodules.Purchase_bills != Null %}
-                  <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                    <!-- <i class="ti ti-mail fs-6"></i> -->
+                <a href="{% url 'view_purchasebill' %}" class="d-flex align-items-center gap-2 dropdown-item">
+                  <!-- <i class="ti ti-mail fs-6"></i> -->
+                  <div class="d-flex">
                     <p class="mb-0 fs-3">Purchase Bills</p>
-                  </a>
-                  <hr>
+                    <a href="{% url 'add_purchasebill' %}"><i class="fa fa-plus text-dark" ></i></a>
+                  </div>
+                </a>
+                <hr>
                   {% endif %}
                   {% if allmodules.Payment_out != Null %}
                   <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
@@ -216,16 +236,22 @@
                   <hr>
                   {% endif %}
                   {% if allmodules.Purchase_order != Null %}
-                  <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                  <a href="{% url 'view_purchaseorder' %}" class="d-flex align-items-center gap-2 dropdown-item">
                     <!-- <i class="ti ti-list-check fs-6"></i> -->
-                    <p class="mb-0 fs-3">Purchase Order</p>
+                    <div class="d-flex">
+                      <p class="mb-0 fs-3">Purchase Order</p>
+                      <a href="{% url 'add_purchaseorder' %}"><i class="fa fa-plus text-dark" ></i></a>
+                    </div>
                   </a>
-                  <hr>
+                  <br>
                   {% endif %}
                   {% if allmodules.Purchase_return != Null %}
-                  <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                  <a href="{% url 'view_purchasedebit' %}" class="d-flex align-items-center gap-2 dropdown-item">
                     <!-- <i class="ti ti-user fs-6"></i> -->
-                    <p class="mb-0 fs-3">Purchase Return/ Dr. Note</p>
+                    <div class="d-flex">
+                    <p class="mb-0 fs-3">Purchase Return/ Dr.Note</p>
+                    <a href="{% url 'add_debitnote' %}"><i class="fa fa-plus text-dark"></i></a>
+                  </div>
                   </a>
                   <hr>
                   {% endif %}
@@ -237,13 +263,19 @@
               
             </li>
 
-            <li class="sidebar-item">
-              <a class="sidebar-link mt-2" href="" aria-expanded="false"
-                style="color: black;background-color: rgb(210, 235, 241,0.5);">
+            <li class="sidebar-item" style="display: flex; justify-content: space-between;">
+              <a class="sidebar-link mt-2" href="{% url 'expense' %}" aria-expanded="false"
+                style="color: black; background-color: rgb(210, 235, 241, 0.5); flex: 1; border-radius: 10px 0px 0px 10px;">
                 <span>
                   <b style="margin-left: 10px;"><i class="fa fa-wallet"></i></b>
                 </span>
                 <span class="hide-menu"><b>Expenses</b></span>
+              </a>
+              <a href="{% url 'newexpenses' %}" class="sidebar-link  mt-2 plus-icon"
+                style="background-color: rgb(210, 235, 241, 0.5); border-radius: 0px 10px 10px 0px;">
+                <span>
+                  <b style="margin-right: 10px;"><i class="fa fa-plus text-dark"></i></b>
+                </span>
               </a>
             </li>
             
@@ -284,6 +316,13 @@
                   <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
                     <!-- <i class="ti ti-user fs-6"></i> -->
                     <p class="mb-0 fs-3">Loan Accounts</p>
+                  </a>
+                  <hr>
+                  {% endif %}
+                  {% if allmodules.Upi != Null %}
+                  <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                    <!-- <i class="ti ti-user fs-6"></i> -->
+                    <p class="mb-0 fs-3">UPI</p>
                   </a>
                   <hr>
                   {% endif %}
@@ -338,23 +377,51 @@
               <li class="nav-item dropdown">
                 <a class="nav-link nav-icon-hover" href="" id="drop2" data-bs-toggle="dropdown"
                   aria-expanded="false">
-                  {% if company.profile_pic %}
-                  <img width="35" height="35" class="rounded-circle" src="{{ company.profile_pic.url }}" alt="">
-                  {% else %}
-                  <img src="{% static 'assets/images/profile/user-1.jpg' %}" alt="" width="35" height="35"
-                    class="rounded-circle">
-                  {% endif %}
-
+                  {% if staff.position == 'company' %}
+                  
+                    {% if staff.company.profile_pic %}
+                      <img width="35" height="35" class="rounded-circle" src="{{ staff.company.profile_pic.url }}" alt="">
+                    {% else %}
+                      <img src="{% static 'assets/images/profile/user-1.jpg' %}" alt="" width="35" height="35"
+                      class="rounded-circle">
+                    {% endif %}
+                  {% else %}  
+                    {% if staff.img %}
+                      <img width="35" height="35" class="rounded-circle" src="{{ staff.img.url }}" alt="">
+                    {% else %}
+                      <img src="{% static 'assets/images/profile/user-1.jpg' %}" alt="" width="35" height="35"
+                      class="rounded-circle">
+                    {% endif %}
+                  {% endif %}  
+                 
+                 
                   <h5 class="h5" style="font-family: 'Times New Roman', Times, serif;padding-left: 5px;">
-                    <b>{{company.company_name}}</b></h5>
+                    <b>
+                      {% if staff.position == 'company' %}
+
+                        {{staff.company.company_name}}
+
+                      {% else %}
+
+                        {{staff.first_name}}{{staff.last_name}}
+
+                      {% endif %} 
+                    </b></h5>
 
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
                   <div class="message-body">
-                    <a href="{% url 'Companyprofile' %}" class="d-flex align-items-center gap-2 dropdown-item">
+                    {% if staff.position == 'company' %}
+                      <a href="{% url 'Companyprofile' %}" class="d-flex align-items-center gap-2 dropdown-item">
                       <i class="ti ti-user fs-6"></i>
                       <p class="mb-0 fs-3">Profile</p>
-                    </a>
+                      </a>
+                    {% else %} 
+                      <a href="{% url 'staff_profile' %}" class="d-flex align-items-center gap-2 dropdown-item">
+                      <i class="ti ti-user fs-6"></i>
+                      <p class="mb-0 fs-3">Profile</p>
+                      </a> 
+                    {% endif %}  
                     
                     <a href="{% url 'logout' %}" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
                   </div>
@@ -378,7 +445,7 @@
   <script src="{% static 'assets/libs/apexcharts/dist/apexcharts.min.js' %}"></script>
   <script src="{% static 'assets/libs/simplebar/dist/simplebar.js' %}"></script>
   <script src="{% static 'assets/js/dashboard.js' %}"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
   <script>
     /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
     var dropdown = document.getElementsByClassName("dropdown-btn");
