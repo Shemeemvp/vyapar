@@ -467,35 +467,49 @@ def distributor_profile(request):
 
 # ========================================   ASHIKH V U (START) ======================================================
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def item_create(request):
-  item_units = UnitModel.objects.filter(user=request.user.id)
-  return render(request,'company/item_create.html',{'item_units':item_units})
+  sid = request.session.get('staff_id')
+  staff =  staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)
 
-@login_required(login_url='login')
+  # item_units = UnitModel.objects.filter(user=request.user.id)
+  item_units = UnitModel.objects.filter(company = cmp) #updated - shemeem
+  return render(request,'company/item_create.html',{'item_units':item_units,'company':cmp, 'staff':staff})
+
+# @login_required(login_url='login')
 def items_list(request,pk):
   try:
-    get_company_id_using_user_id = company.objects.get(user=request.user.id)
-    all_items = ItemModel.objects.filter(company=get_company_id_using_user_id.id)
+    sid = request.session.get('staff_id')
+    staff =  staff_details.objects.get(id=sid)
+    cmp = company.objects.get(id=staff.company.id)
+    
+    # get_company_id_using_user_id = company.objects.get(user=request.user.id)
+    # all_items = ItemModel.objects.filter(company=get_company_id_using_user_id.id)
+    all_items = ItemModel.objects.filter(company=cmp) #updated - shemeem
     if pk == 0:
       first_item = all_items.filter().first()
     else:
       first_item = all_items.get(id=pk)
-    transactions = TransactionModel.objects.filter(user=request.user.id,item=first_item.id).order_by('-trans_created_date')
+    # transactions = TransactionModel.objects.filter(user=request.user.id,item=first_item.id).order_by('-trans_created_date')
+    transactions = TransactionModel.objects.filter(company = cmp,item=first_item.id).order_by('-trans_created_date')
     check_var = 0
     if all_items == None or all_items == '' or first_item == None or first_item == '' or transactions == None or transactions == '':
       return render(request,'company/items_create_first_item.html')
-    return render(request,'company/items_list.html',{'all_items':all_items,
-                                                      'first_item':first_item,
-                                                      'transactions':transactions,})
+    return render(request,'company/items_list.html',{'all_items':all_items,'first_item':first_item,'transactions':transactions,'company':cmp, 'staff':staff})
   except:
     return render(request,'company/items_create_first_item.html')
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def item_create_new(request):
   if request.method=='POST':
-    user = User.objects.get(id=request.user.id)
-    company_user_data = company.objects.get(user=request.user.id)
+    #updated-shemeem
+    sid = request.session.get('staff_id')
+    staff =  staff_details.objects.get(id=sid)
+    cmp = company.objects.get(id=staff.company.id)
+
+    # user = User.objects.get(id=request.user.id)
+    # company_user_data = company.objects.get(user=request.user.id)
     item_name = request.POST.get('item_name')
     item_hsn = request.POST.get('item_hsn')
     item_unit = request.POST.get('item_unit')
@@ -516,8 +530,8 @@ def item_create_new(request):
     item_min_stock_maintain = request.POST.get('item_min_stock_maintain')
     if item_min_stock_maintain == ''  or None:
       item_min_stock_maintain = 0
-    item_data = ItemModel(user=user,
-                          company=company_user_data,
+    item_data = ItemModel(user=staff.company.user,
+                          company=cmp,
                           item_name=item_name,
                           item_hsn=item_hsn,
                           item_unit=item_unit,
@@ -532,7 +546,7 @@ def item_create_new(request):
                           item_date=item_date,
                           item_min_stock_maintain=item_min_stock_maintain)
     item_data.save()
-    print(f'user : {user}\ncompany_user_data {company_user_data}')
+    # print(f'user : {user}\ncompany_user_data {company_user_data}')
     # print(f'item_name : {item_name}\nitem_hsn : {item_hsn}\nitem_unit : {item_unit}\nitem_taxable : {item_taxable}\n')
     # print(f'item_gst : {item_gst}\nitem_igst : {item_igst}\nitem_sale_price : {item_sale_price}\nitem_purchase_price : {item_purchase_price}\n')
     # print(f'item_opening_stock : {item_opening_stock}\nitem_at_price : {item_at_price}\nitem_date : {item_date}\nitem_min_stock_maintain : {item_min_stock_maintain}\n')
@@ -544,39 +558,58 @@ def item_create_new(request):
   return redirect('item_create')
 
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def item_delete(request,pk):
-  get_company_id_using_user_id = company.objects.get(user=request.user.id)
+  # get_company_id_using_user_id = company.objects.get(user=request.user.id)
   item_to_delete = ItemModel.objects.get(id=pk)
   item_to_delete.delete()
   return redirect('items_list',pk=0)
 
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def item_view_or_edit(request,pk):
+  #updated-shemeem
+  sid = request.session.get('staff_id')
+  staff =  staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)
+  
   item = ItemModel.objects.get(id=pk)
-  item_units = UnitModel.objects.filter(user=request.user.id)
-  return render(request,'company/item_view_or_edit.html',{'item':item,
-                                                          'item_units':item_units,})
+  # item_units = UnitModel.objects.filter(user=request.user.id)
+  item_units = UnitModel.objects.filter(company = cmp)
+  return render(request,'company/item_view_or_edit.html',{'item':item,'item_units':item_units,'staff':staff})
 
   
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def item_unit_create(request):
   if request.method=='POST':
-    user = User.objects.get(id=request.user.id)
-    company_user_data = company.objects.get(user=request.user.id)
+    #updated-shemeem
+    sid = request.session.get('staff_id')
+    staff =  staff_details.objects.get(id=sid)
+    cmp = company.objects.get(id=staff.company.id)
+
+    # user = User.objects.get(id=request.user.id)
+    # company_user_data = company.objects.get(user=request.user.id)
+
     item_unit_name = request.POST.get('item_unit_name')
-    unit_data = UnitModel(user=user,company=company_user_data,unit_name=item_unit_name)
+    unit_data = UnitModel(user=cmp.user,company=cmp,unit_name=item_unit_name)
     unit_data.save()
   return JsonResponse({'message':'asdasd'})
 
   
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def item_update(request,pk):
   if request.method=='POST':
+    #updated-shemeem
+    sid = request.session.get('staff_id')
+    staff =  staff_details.objects.get(id=sid)
+    cmp = company.objects.get(id=staff.company.id)
+
     item_data = ItemModel.objects.get(id=pk)
-    user = User.objects.get(id=request.user.id)
-    company_user_data = company.objects.get(user=request.user.id)
+    # user = User.objects.get(id=request.user.id)
+    user = cmp.user
+    # company_user_data = company.objects.get(user=request.user.id)
+    company_user_data = cmp
+
     item_name = request.POST.get('item_name')
     item_hsn = request.POST.get('item_hsn')
     item_unit = request.POST.get('item_unit')
@@ -628,36 +661,54 @@ def item_update(request,pk):
   return redirect('items_list',pk=item_data.id)
 
   
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def item_search_filter(request):
+  #updated-shemeem
+  sid = request.session.get('staff_id')
+  staff =  staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)
+
   search_string = request.POST.get('searching_item')
-  items_filtered = ItemModel.objects.filter(user=request.user.id)
+  # items_filtered = ItemModel.objects.filter(user=request.user.id)
+  items_filtered = ItemModel.objects.filter(user=cmp.user)
   items_filtered = items_filtered.filter(Q(item_name__icontains=search_string))
   item_unit_name = request.POST.get('item_unit_name')
   return TemplateResponse(request,'company/item_search_filter.html',{'all_items':items_filtered})
 
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def item_get_detail(request,pk):
+  #updated-shemeem
+  sid = request.session.get('staff_id')
+  staff =  staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)
+
   item = ItemModel.objects.get(id=pk)
-  transactions = TransactionModel.objects.filter(user=request.user.id,item=item.id).order_by('-trans_created_date')
-  return TemplateResponse(request,'company/item_get_detail.html',{"item":item,
-                                                                  'transactions':transactions,})
+  transactions = TransactionModel.objects.filter(user=cmp.user,item=item.id).order_by('-trans_created_date')
+  return TemplateResponse(request,'company/item_get_detail.html',{"item":item,'transactions':transactions,})
 
   
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def item_get_details_for_modal_target(request,pk):
   item = ItemModel.objects.get(id=pk)
   return TemplateResponse(request,'company/item_get_details_for_modal_target.html',{"item":item,})
 
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def ajust_quantity(request,pk):
+  #updated-shemeem
+  sid = request.session.get('staff_id')
+  staff =  staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)
+
   if request.method=='POST':
     item = ItemModel.objects.get(id=pk)
 
-    user = User.objects.get(id=request.user.id)
-    company_user_data = company.objects.get(user=request.user.id)
+    # user = User.objects.get(id=request.user.id)
+    user = cmp.user
+    # company_user_data = company.objects.get(user=request.user.id)
+    company_user_data = cmp
+
     trans_type_check_checked = request.POST.get('trans_type')
     if trans_type_check_checked == 'on':
       trans_type = 'reduce stock'
@@ -686,7 +737,7 @@ def ajust_quantity(request,pk):
   return redirect('items_list',pk=item.id)
 
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def transaction_delete(request,pk):
   transaction = TransactionModel.objects.get(id=pk)
   item = ItemModel.objects.get(id=transaction.item_id)
@@ -707,24 +758,31 @@ def transaction_delete(request,pk):
   return redirect('items_list',pk=item.id)
 
   
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def item_transaction_view_or_edit(request,pk,tran):
   item = ItemModel.objects.get(id=pk)
   transaction = TransactionModel.objects.get(id=tran)
   print('enterd')
-  return TemplateResponse(request,'company/item_transaction_view_or_edit.html',{"item":item,
-                                                                                "transaction":transaction,})
+  return TemplateResponse(request,'company/item_transaction_view_or_edit.html',{"item":item,"transaction":transaction,})
 
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def update_adjusted_transaction(request,pk,tran):
   item = ItemModel.objects.get(id=pk)
   transaction = TransactionModel.objects.get(id=tran)
+  #updated-shemeem
+  sid = request.session.get('staff_id')
+  staff =  staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)
+
   if request.method=='POST':
     item = ItemModel.objects.get(id=pk)
 
-    user = User.objects.get(id=request.user.id)
-    company_user_data = company.objects.get(user=request.user.id)
+    # user = User.objects.get(id=request.user.id)
+    user = cmp.user
+    # company_user_data = company.objects.get(user=request.user.id)
+    company_user_data = cmp
+
     trans_type_check_checked = request.POST.get('trans_type')
     if trans_type_check_checked == 'on':
       trans_type = 'reduce stock'
@@ -762,7 +820,7 @@ def update_adjusted_transaction(request,pk,tran):
     transaction.save()
   return redirect('items_list',pk=item.id)
   
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def item_delete_open_stk(request,pk):
   item = ItemModel.objects.get(id=pk)
   if item.item_opening_stock > item.item_current_stock:
@@ -781,7 +839,12 @@ def item_delete_open_stk(request,pk):
 
 
 def add_parties(request):
-  return render(request, 'company/add_parties.html')
+  #updated-shemeem
+  sid = request.session.get('staff_id')
+  staff =  staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)
+
+  return render(request, 'company/add_parties.html',{'staff':staff})
 
 
 
@@ -793,18 +856,31 @@ def add_parties(request):
 
 
 def edit_party(request,id):
-  Company = company.objects.get(user=request.user)
-  user_id = request.user.id
+  #updated-shemeem
+  sid = request.session.get('staff_id')
+  staff =  staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)
+
+  # Company = company.objects.get(user=request.user)
+  Company = cmp
+  # user_id = request.user.id
+  user_id = cmp.user.id
   getparty=party.objects.get(id=id)
-  Party=party.objects.filter(user=request.user)
-  return render(request, 'company/edit_party.html',{'Company':Company,'user_id':user_id,'Party':Party,'getparty':getparty})
+  # Party=party.objects.filter(user=request.user)
+  Party=party.objects.filter(user=cmp.user)
+  return render(request, 'company/edit_party.html',{'Company':Company,'user_id':user_id,'Party':Party,'getparty':getparty,'staff':staff})
 
 
 def edit_saveparty(request, id):
-    Party=party.objects.filter(user=request.user)
-    user_id = request.user.id
+    #updated-shemeem
+    sid = request.session.get('staff_id')
+    staff =  staff_details.objects.get(id=sid)
+    cmp = company.objects.get(id=staff.company.id)
+
+    Party=party.objects.filter(user=cmp.user)
+    user_id = cmp.user.id
     getparty = party.objects.get(id=id)
-    Company = company.objects.get(user=request.user)
+    Company = cmp
 
     if request.method == 'POST':
         getparty.party_name = request.POST.get('partyname')
@@ -7255,3 +7331,166 @@ def saleorder_convert(request, sid):
   return redirect('sale_order')
   
 #End
+
+
+#______________Payment In__________________shemeem________________________________
+def paymentIn(request):
+  sid = request.session.get('staff_id')
+  staff = staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)
+  allmodules= modules_list.objects.get(company=cmp,status='New')
+  payments = PaymentIn.objects.filter(company = cmp)
+  context = {
+    'staff':staff,'allmodules':allmodules,'paymentIn':payments,
+  }
+  return render(request, 'company/payment_in.html',context)
+
+
+def createPaymentIn(request):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+            
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    com =  company.objects.get(id = staff.company.id)
+    allmodules= modules_list.objects.get(company=com,status='New')
+    try:
+      parties = party.objects.filter(company = com)
+      items = ItemModel.objects.filter(company = com)
+      item_units = UnitModel.objects.filter(company=com)
+      banks = BankModel.objects.filter(company = com)
+
+      # Fetching last bill and assigning upcoming bill no as current + 1
+      # Also check for if any bill is deleted and bill no is continuos w r t the deleted bill
+      latest_bill = PaymentIn.objects.filter(company = com).order_by('-id').first()
+
+      if latest_bill:
+          last_number = int(latest_bill.rec_no)
+          new_number = last_number + 1
+      else:
+          new_number = 1
+
+      if DeletedPaymentIn.objects.filter(company = com).exists():
+          deleted = DeletedPaymentIn.objects.get(company = com)
+          if deleted:
+              while int(deleted.rec_no) >= new_number:
+                  new_number+=1
+      
+      context = {
+        'staff':staff, 'company':com,'allmodules':allmodules, 'parties':parties, 'rec_no':new_number,'items':items,'item_units':item_units,'banks':banks,
+      }
+      return render(request, 'company/create_payment_in.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(paymentIn)
+
+def getBankDetails(request):        
+  try:
+      bankId = request.POST.get('id')
+      bankDetails = BankModel.objects.get(id = int(bankId))
+      return JsonResponse({'status':"true", 'id':bankDetails.id, 'acc_number':bankDetails.account_num})
+  except Exception as e:
+      print(e)
+      return JsonResponse({'status':'false'})
+
+
+def createNewPaymentIn(request):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+            
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    com =  company.objects.get(id = staff.company.id)
+
+    try:
+      if request.method == 'POST':
+        payment = PaymentIn(
+          staff = staff,
+          company = com,
+          party = party.objects.get(id = request.POST['party_name']),
+          rec_no = request.POST['receipt_no'],
+          date = request.POST['date'],
+          party_name = party.objects.get(id = request.POST['party_name']).party_name,
+          contact = request.POST['contact'],
+          billing_address = request.POST['address'],
+          description = request.POST['description'],
+          payment_type = 'Payment',
+          payment_method = request.POST['payment_method'],
+          payment_acc_number = None if request.POST['payment_acc_num'] == "" else request.POST['payment_acc_num'],
+          payment_cheque_id = request.POST['payment_cheque_id'],
+          payment_upi_id = request.POST['payment_upi_id'],
+          total_amount = request.POST['payment_amount'],
+          payment_received = request.POST['payment_amount'],
+          balance = 0.0,
+        )
+        payment.save()
+
+        #Transaction History
+        history = PaymentInTransactionHistory(
+          staff = staff,
+          payment = payment,
+          company = com,
+          action = "Created",
+          date = payment.date
+        )
+        history.save()
+        print('saved...')
+        if 'save_and_next' in request.POST:
+          return redirect(createPaymentIn)
+        return redirect(paymentIn)
+    except Exception as e:
+      print(e)
+      return redirect(createPaymentIn)
+
+
+def deletePaymentIn(request,id):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    com =  company.objects.get(id = staff.company.id)
+    try:
+      pay = PaymentIn.objects.get(id = id)
+
+      # Storing receipt number to deleted table
+      # if entry exists and lesser than the current, update and save => Only one entry per company
+
+      if DeletedPaymentIn.objects.filter(company = com).exists():
+        deleted = DeletedPaymentIn.objects.get(company = com)
+        if deleted:
+          if int(pay.rec_no) > int(deleted.rec_no):
+            deleted.rec_no = pay.rec_no
+            deleted.save()
+      else:
+        deleted = DeletedPaymentIn(company = com, staff = staff, rec_no = pay.rec_no)
+        deleted.save()
+
+      pay.delete()
+      messages.success(request, 'Payment In data deleted successfully.!')
+      return redirect(paymentIn)
+    except Exception as e:
+      print(e)
+      return redirect(paymentIn)
+  return redirect('/')
+
+
+def paymentHistory(request):
+  pid = request.POST['id']
+  sid = request.session.get('staff_id')
+  staff = staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id) 
+  pay = PaymentIn.objects.get(id=pid, company=cmp)
+  hst = PaymentInTransactionHistory.objects.filter(payment = pay, company=cmp).last()
+  name = hst.staff.first_name + ' ' + hst.staff.last_name 
+  action = hst.action
+  return JsonResponse({'name':name,'action':action,'pid':pid})
+
+
+
+#_________________________________________________________________________________

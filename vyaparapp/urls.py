@@ -298,6 +298,17 @@ urlpatterns = [
     path('saleorderto_invoice/<int:id>', views.saleorderto_invoice, name='saleorderto_invoice'),
     path('saleorder_convert/<int:sid>', views.saleorder_convert, name='saleorder_convert'),
     #End
+
+    #______________Payment In__________________shemeem________________________________
+    path('listout_paymentin',views.paymentIn, name='paymentIn'),
+    path('create_payment_in',views.createPaymentIn,name='createPaymentIn'),
+    path('get_bank_acc_number',views.getBankDetails, name='getBankDetails'),
+    path('create_new_payment_in',views.createNewPaymentIn, name='createNewPaymentIn'),
+    path('delete_payment_in/<int:id>',views.deletePaymentIn, name='deletePaymentIn'),
+    path('payment_trans_history',views.paymentHistory, name = 'paymentHistory'),
+
+
+    #_________________________________________________________________________________
     
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
     
