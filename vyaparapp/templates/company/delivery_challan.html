@@ -346,7 +346,7 @@
                         </thead>
                         <tbody>
                             {% for i in challan %}
-                            <tr>
+                            <tr ondblclick="window.location.href=`{% url 'viewChallan' i.challan.id %}`" style="cursor: pointer;">
                                 <td>{{forloop.counter}}</td>
                                 <td>{{i.challan.date}}</td>
                                 <td>{{i.challan.party_name}}</td>

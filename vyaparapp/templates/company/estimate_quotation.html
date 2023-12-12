@@ -332,7 +332,7 @@
                         </thead>
                         <tbody>
                             {% for i in estimates %}
-                            <tr>
+                            <tr ondblclick="window.location.href=`{% url 'viewEstimate' i.estimate.id %}`" style="cursor: pointer;">
                                 <td>{{forloop.counter}}</td>
                                 <td>{{i.estimate.date}}</td>
                                 <td>{{i.estimate.ref_no}}</td>

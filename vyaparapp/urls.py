@@ -306,7 +306,13 @@ urlpatterns = [
     path('create_new_payment_in',views.createNewPaymentIn, name='createNewPaymentIn'),
     path('delete_payment_in/<int:id>',views.deletePaymentIn, name='deletePaymentIn'),
     path('payment_trans_history',views.paymentHistory, name = 'paymentHistory'),
-
+    path('view_payment_in/<int:id>',views.viewPaymentIn, name='viewPaymentIn'),
+    path('share_paymentin_to_email/<int:id>',views.sharePaymentInToEmail,name='sharePaymentInToEmail'),
+    path('edit_payment_in_receipt/<int:id>',views.editPaymentIn, name='editPaymentIn'),
+    path('update_payment_in/<int:id>',views.updatePaymentIn, name='updatePaymentIn'),
+    path('history_payment_in/<int:id>',views.paymentInHistory,name='paymentInHistory'),
+    path('download_payment_sample_file',views.downloadPaymentSampleImportFile, name = 'downloadPaymentSampleImportFile'),
+    path('import_payment_form_excel',views.importPaymentFromExcel, name='importPaymentFromExcel'),
 
     #_________________________________________________________________________________
     

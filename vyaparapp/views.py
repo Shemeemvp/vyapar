@@ -7358,8 +7358,6 @@ def createPaymentIn(request):
     allmodules= modules_list.objects.get(company=com,status='New')
     try:
       parties = party.objects.filter(company = com)
-      items = ItemModel.objects.filter(company = com)
-      item_units = UnitModel.objects.filter(company=com)
       banks = BankModel.objects.filter(company = com)
 
       # Fetching last bill and assigning upcoming bill no as current + 1
@@ -7379,7 +7377,7 @@ def createPaymentIn(request):
                   new_number+=1
       
       context = {
-        'staff':staff, 'company':com,'allmodules':allmodules, 'parties':parties, 'rec_no':new_number,'items':items,'item_units':item_units,'banks':banks,
+        'staff':staff, 'company':com,'allmodules':allmodules, 'parties':parties, 'rec_no':new_number,'banks':banks,
       }
       return render(request, 'company/create_payment_in.html',context)
     except Exception as e:
@@ -7484,12 +7482,282 @@ def paymentHistory(request):
   pid = request.POST['id']
   sid = request.session.get('staff_id')
   staff = staff_details.objects.get(id=sid)
-  cmp = company.objects.get(id=staff.company.id) 
-  pay = PaymentIn.objects.get(id=pid, company=cmp)
-  hst = PaymentInTransactionHistory.objects.filter(payment = pay, company=cmp).last()
+  cmp = company.objects.get(id=staff.company.id)
+  pay = PaymentIn.objects.get(rec_no=pid, company=cmp)
+  hst = PaymentInTransactionHistory.objects.filter(payment = pay).last()
   name = hst.staff.first_name + ' ' + hst.staff.last_name 
   action = hst.action
   return JsonResponse({'name':name,'action':action,'pid':pid})
+
+
+def viewPaymentIn(request,id):
+  sid = request.session.get('staff_id')
+  staff = staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)
+
+  paymentInDetails = PaymentIn.objects.get(id = id)
+  allmodules= modules_list.objects.get(company=cmp,status='New')
+  context = {
+    'payment':paymentInDetails,'staff':staff,'allmodules':allmodules,'company':cmp,
+  }
+
+  return render(request, 'company/payment_in_details.html',context)
+
+
+def sharePaymentInToEmail(request,id):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    com =  company.objects.get(id = staff.company.id)
+    try:
+      if request.method == 'POST':
+        emails_string = request.POST['email_ids']
+
+        # Split the string by commas and remove any leading or trailing whitespace
+        emails_list = [email.strip() for email in emails_string.split(',')]
+        email_message = request.POST['email_message']
+        # print(emails_list)
+
+        payment = PaymentIn.objects.get(id = id)
+        context = {'payment': payment,'company':com}
+        template_path = 'company/payment_in_pdf.html'
+        template = get_template(template_path)
+
+        html  = template.render(context)
+        result = BytesIO()
+        pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+        pdf = result.getvalue()
+        filename = f'Payment In - {payment.rec_no}.pdf'
+        subject = f"Payment In Receipt - {payment.rec_no}"
+        email = EmailMessage(subject, f"Hi,\nPlease find the attached Receipt of Payment In -{payment.rec_no}. \n{email_message}\n\n--\nRegards,\n{com.company_name}\n{com.address}\n{com.city} - {com.state}\n{com.contact}", from_email=settings.EMAIL_HOST_USER, to=emails_list)
+        email.attach(filename, pdf, "application/pdf")
+        email.send(fail_silently=False)
+
+        messages.success(request, 'Receipt has been shared via email successfully..!')
+        return redirect(viewPaymentIn,id)
+    except Exception as e:
+        print(e)
+        messages.error(request, f'{e}')
+        return redirect(viewPaymentIn, id)
+
+
+def editPaymentIn(request, id):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    com =  company.objects.get(id = staff.company.id)
+    try:
+      payment = PaymentIn.objects.get(id = id)
+      allmodules= modules_list.objects.get(company=com,status='New')
+      parties = party.objects.filter(company = com)
+      banks = BankModel.objects.filter(company = com)
+      context = {
+        'payment':payment,'staff':staff,'allmodules':allmodules,'company':com,'parties':parties,'banks':banks,
+      }
+      return render(request, 'company/edit_payment_in.html',context)
+    except Exception as e:
+      print(e)
+      return redirect(viewPaymentIn,id)
+
+
+def updatePaymentIn(request,id):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+            
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    com =  company.objects.get(id = staff.company.id)
+
+    try:
+      payment = PaymentIn.objects.get(id = id)
+      if request.method == 'POST':
+        payment.staff = staff
+        payment.company = com
+        payment.party = party.objects.get(id = request.POST['party_name'])
+        payment.rec_no = request.POST['receipt_no']
+        payment.date = request.POST['date']
+        payment.party_name = party.objects.get(id = request.POST['party_name']).party_name
+        payment.contact = request.POST['contact']
+        payment.billing_address = request.POST['address']
+        payment.description = request.POST['description']
+        payment.payment_type = 'Payment'
+        payment.payment_method = request.POST['payment_method']
+        payment.payment_acc_number = None if request.POST['payment_acc_num'] == "" else request.POST['payment_acc_num']
+        payment.payment_cheque_id = request.POST['payment_cheque_id']
+        payment.payment_upi_id = request.POST['payment_upi_id']
+        payment.total_amount = request.POST['payment_amount']
+        payment.payment_received = request.POST['payment_amount']
+        payment.balance = 0.0
+        payment.save()
+
+        #Transaction History
+        history = PaymentInTransactionHistory(
+          staff = staff,
+          payment = payment,
+          company = com,
+          action = "Updated",
+          date = date.today()
+        )
+        history.save()
+
+        return redirect(viewPaymentIn,id)
+    except Exception as e:
+      print(e)
+      return redirect(editPaymentIn,id)
+
+def paymentInHistory(request,id):
+  sid = request.session.get('staff_id')
+  staff = staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)   
+  allmodules= modules_list.objects.get(company=staff.company,status='New')
+  pay = PaymentIn.objects.get(id=id,company=cmp)
+  hst= PaymentInTransactionHistory.objects.filter(payment=pay,company=cmp)
+
+  context = {'staff':staff,'allmodules':allmodules,'history':hst,'payment':pay}
+  return render(request,'company/payment_in_history.html',context)
+
+
+def downloadPaymentSampleImportFile(request):
+  payment_table_data = [['SLNO','DATE','NAME','PAYMENT METHOD','ACCOUNT NUMBER','CHEQUE ID','UPI ID','TOTAL','RECEIVED','BALANCE','DESCRIPTION'], ['1', '2023-11-20', 'John Doe', 'Canara', '767676677667677','','','1000','500','0','Description']]
+
+  wb = Workbook()
+
+  sheet1 = wb.active
+  sheet1.title = 'payment'
+
+  # Populate the sheets with data
+  for row in payment_table_data:
+    sheet1.append(row)
+
+  # Create a response with the Excel file
+  response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+  response['Content-Disposition'] = 'attachment; filename=payment_sample_file.xlsx'
+
+  # Save the workbook to the response
+  wb.save(response)
+  return response
+
+
+def importPaymentFromExcel(request):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+            
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    com =  company.objects.get(id = staff.company.id)    
+    
+    current_datetime = timezone.now()
+    dateToday =  current_datetime.date()
+
+    if request.method == "POST" and 'excel_file' in request.FILES:
+        excel_file = request.FILES['excel_file']
+        wb = load_workbook(excel_file)
+
+        # checking challan sheet columns
+        try:
+          ws = wb["payment"]
+        except:
+          print('sheet not found')
+          messages.error(request,'`payment` sheet not found.! Please check.')
+          return redirect(paymentIn)
+        
+        ws = wb["payment"]
+        payment_columns = ['SLNO','DATE','NAME','PAYMENT METHOD','ACCOUNT NUMBER','CHEQUE ID','UPI ID','TOTAL','RECEIVED','BALANCE','DESCRIPTION']
+        payment_sheet = [cell.value for cell in ws[1]]
+        if payment_sheet != payment_columns:
+          print('invalid sheet')
+          messages.error(request,'`payment` sheet column names or order is not in the required formate.! Please check.')
+          return redirect(paymentIn)
+
+        for row in ws.iter_rows(min_row=2, values_only=True):
+          slno,date,name,payment_method,acc_num,cheque,upi,total,received,balance,description = row
+          if slno is None or name is None or total is None or received is None:
+            messages.error(request,'`payment` sheet entries missing required fields.! Please check.')
+            return redirect(paymentIn)
+        
+        # getting data from estimate sheet and create estimate.
+        incorrect_data = []
+        ws = wb['payment']
+        for row in ws.iter_rows(min_row=2, values_only=True):
+          slno,date,name,payment_method,acc_num,cheque,upi,total,received,balance,description = row
+
+          # Fetching last bill and assigning upcoming bill no as current + 1
+          # Also check for if any bill is deleted and bill no is continuos w r t the deleted bill
+          latest_bill = PaymentIn.objects.filter(company = com).order_by('-id').first()
+          
+          if latest_bill:
+              last_number = int(latest_bill.rec_no)
+              new_number = last_number + 1
+          else:
+              new_number = 1
+
+          if DeletedPaymentIn.objects.filter(company = com).exists():
+              deleted = DeletedPaymentIn.objects.get(company = com)
+              if deleted:
+                  while int(deleted.rec_no) >= new_number:
+                      new_number+=1
+          if not party.objects.filter(company = com, party_name = name).exists():
+            incorrect_data.append(slno)
+            continue
+          try:
+            prt = party.objects.get(company = com, party_name = name)
+            cntct = prt.contact
+            adrs = prt.address
+          except:
+            pass
+
+          if date is None:
+            date = dateToday
+
+          payment = PaymentIn(
+            staff = staff,
+            company = com,
+            date = date,
+            rec_no = new_number,
+            party = prt,
+            party_name = name,
+            contact = cntct,
+            billing_address = adrs,
+            description = description,
+            payment_type = 'Payment',
+            payment_method = payment_method,
+            payment_acc_number = acc_num,
+            payment_cheque_id = cheque,
+            payment_upi_id = upi,
+            total_amount = total,
+            payment_received = received,
+            balance = 0 if balance is None else balance,
+          )
+          payment.save()
+
+          # Transaction history
+          history = PaymentInTransactionHistory(
+            staff = staff,
+            payment = payment,
+            company = com,
+            action = "Created"
+          )
+          history.save()
+
+    messages.success(request, 'Data imported successfully.!')
+    if incorrect_data:
+      messages.warning(request, f'Data with following Sl No could not import due to incorrect data provided - {", ".join(str(item) for item in incorrect_data)}')
+    return redirect(paymentIn)
+
+
+
+
+
 
 
 

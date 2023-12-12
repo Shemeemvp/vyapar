@@ -134,13 +134,13 @@
         </div>
         <div style="background-color: rgba(0, 195, 255, 0.205);" class="p-3 pb-0 mb-0">
             <div class="row pb-0 mb-0">
-                <div class="col text-center pb-2" style="border-bottom: 3px solid rgba(0, 0, 0, 0.548);"><a class="fw-bolder fs-4 text-dark" href="#">NEW PAYMENT IN</a></div>
+                <div class="col text-center pb-2" style="border-bottom: 3px solid rgba(0, 0, 0, 0.548);"><a class="fw-bolder fs-4 text-dark" href="#">EDIT PAYMENT</a></div>
             </div>
         </div>
 
         <div class="row pt-0 m-0 mt-3">
             <div class="card p-0 bg-light bs">
-                <form action="{% url 'createNewPaymentIn' %}" method="post" class="form">
+                <form action="{% url 'updatePaymentIn' payment.id %}" method="post" class="form">
                     {% csrf_token %}
                     <div class="row m-0 p-0 pt-3">
                         <div class="col-md-4">
@@ -149,7 +149,11 @@
                                 <select name="party_name" id="party" class="form-control fw-bolder" required>
                                     <option value="">Select Party</option>
                                     {% for p in parties %}
+                                    {% if payment.party_name == p.party_name %}
+                                    <option value="{{p.id}}" selected>{{p.party_name}}</option>
+                                    {% else %}
                                     <option value="{{p.id}}">{{p.party_name}}</option>
+                                    {% endif %}
                                     {% endfor %}
                                 </select>
                                 <button type="button" class="btn btn-outline-primary ms-1" data-bs-target="#newParty" data-bs-toggle="modal"><i class="fa fa-plus"></i></button>
@@ -177,13 +181,13 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="receipt_number" class="text-dark fw-bolder">Receipt No.</label>
-                                <input class="form-control border-dark fw-bolder text-dark" id="receipt_number" type="text" autocomplete="off" name="receipt_no" value="{{rec_no}}" readonly>
+                                <input class="form-control border-dark fw-bolder text-dark" id="receipt_number" type="text" autocomplete="off" name="receipt_no" value="{{payment.rec_no}}" readonly>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="payment_date" class="text-dark fw-bolder">Date</label>
-                                <input class="form-control border-dark fw-bolder text-dark" id="payment_date" type="date" name="date" value="{% now 'Y-m-d' %}">
+                                <input class="form-control border-dark fw-bolder text-dark" id="payment_date" type="date" name="date" value="{{payment.date|date:'Y-m-d'}}">
                             </div>
                         </div>
                     </div>
@@ -192,7 +196,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="payment_received" class="text-dark fw-bolder">Payment Received</label>
-                                <input class="form-control border-dark fw-bolder text-dark" id="payment_received" type="number" min="0" step="any" autocomplete="off" name="payment_amount" onkeyup="displayAmount()" required>
+                                <input class="form-control border-dark fw-bolder text-dark" id="payment_received" type="number" min="0" step="any" value="{{payment.payment_received}}" autocomplete="off" name="payment_amount" onkeyup="displayAmount()" required>
                             </div>
                         </div>
                         <!-- <div class="col-md-2"></div> -->
@@ -219,15 +223,15 @@
                         <div class="col-md-4">
                             <div class="from-group paymentMethodInputs" id="paymentAccNum" style="display: none;">
                                 <label for="" class="text-dark fw-bolder">Account #</label>
-                                <input class="form-control border-dark fw-bolder text-dark" type="number" name="payment_acc_num" id="payment_acc_num" readonly>
+                                <input class="form-control border-dark fw-bolder text-dark" type="number" value="{{payment.payment_acc_number}}" name="payment_acc_num" id="payment_acc_num" readonly>
                             </div>
                             <div class="from-group paymentMethodInputs" id="paymentUPI" style="display: none;">
                                 <label for="" class="text-dark fw-bolder">UPI ID</label>
-                                <input class="form-control border-dark fw-bolder text-dark" type="text" name="payment_upi_id">
+                                <input class="form-control border-dark fw-bolder text-dark" value="{{payment.payment_upi_id}}" type="text" name="payment_upi_id">
                             </div>
                             <div class="from-group paymentMethodInputs" id="paymentChequeID" style="display: none;">
                                 <label for="" class="text-dark fw-bolder">Cheque ID</label>
-                                <input class="form-control border-dark fw-bolder text-dark" type="text" name="payment_cheque_id">
+                                <input class="form-control border-dark fw-bolder text-dark" value="{{payment.payment_cheque_id}}" type="text" name="payment_cheque_id">
                             </div>
                         </div>
                     </div>
@@ -236,7 +240,7 @@
                         <div class="col-md-5">
                             <div class="form-group">
                                 <label for="description" class="text-dark fw-bolder">Description</label>
-                                <textarea name="description" id="description" class="form-control border-dark fw-bolder text-dark" rows="5" placeholder="Description.."></textarea>
+                                <textarea name="description" id="description" class="form-control border-dark fw-bolder text-dark" rows="5" placeholder="Description..">{{payment.description}}</textarea>
                             </div>
                         </div>
                     </div>
@@ -244,7 +248,7 @@
                     <div class="row mt-4 mb-5">
                         <div class="col-md-4"></div>
                         <div class="col-md-4 d-flex justify-content-center">
-                            <button id="save_and_next_btn" class="btn btn-primary bg-gradient me-1" type="submit" name="save_and_next">SAVE & NEXT</button>
+                            <!-- <button id="save_and_next_btn" class="btn btn-primary bg-gradient me-1" type="submit" name="save_and_next">SAVE & NEXT</button> -->
                             <button id="save_btn" class="btn btn-primary bg-gradient" type="submit">SAVE</button>
                         </div>
                         <div class="col-md-4"></div>
@@ -423,6 +427,70 @@
             sortField: 'value'
         });
     });
+
+    window.onload = function(){
+        document.querySelector('#paymentMethod').value = `{{payment.payment_method}}`;
+        document.querySelector('#paid_amount').innerHTML = `{{payment.payment_received}}`;
+    }
+
+    $(document).ready(function(){
+        var type = `{{payment.payment_method}}`
+        if(type == 'Cash'){
+            $('.paymentMethodInputs').css('display','none');
+        
+        }else if(type == 'Cheque'){
+            $('.paymentMethodInputs').css('display','none');
+
+            $('#paymentChequeID').css('display','block');
+        }else if(type == 'UPI'){
+            $('.paymentMethodInputs').css('display','none');
+
+            $('#paymentUPI').css('display','block');
+        }else{
+            $('.paymentMethodInputs').css('display','none');
+            $('#paymentAccNum').css('display','block');
+        }   
+    });
+
+    $(document).ready(function(){
+        var partyId = $("#party").val();
+
+        $.ajax({
+            url: "{% url 'getPartyDetails' %}", 
+            data: { 
+            
+                id: partyId,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            type : 'POST',
+            success: function(data) {
+                $("#party_address").addClass('d-block');
+                $("#party_contact").addClass('d-block');
+                $("#party_balance").addClass('d-block');
+                $("#party_address").removeClass('d-none');
+                $("#party_contact").removeClass('d-none');
+                $("#party_balance").removeClass('d-none');
+
+                var json_data = JSON.parse(data);
+                for (key in json_data) {
+                    document.getElementById('bill_address').value = json_data[key]['address'];
+                    $('#p_contact').val(json_data[key]['contact']);
+                    $('#p_state').val(json_data[key]['state']);
+                    if (json_data[key]['payment'] == 'To Pay'){
+                        $('#p_bal').css('color','red');
+                        $('#p_bal').text(json_data[key]['balance']);
+                    }else if (json_data[key]['payment'] == 'To Receive'){
+                        $('#p_bal').css('color','green');
+                        $('#p_bal').text(json_data[key]['balance']);
+                    }
+                    else{
+                        $('#p_bal').css('color','black');
+                        $('#p_bal').text(json_data[key]['balance']);
+                    }
+                }
+            }
+        });
+    })
 
     $(document).ready(function() {
         $('#party').change(function() {
