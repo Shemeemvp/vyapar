@@ -255,9 +255,12 @@
                 <hr>
                   {% endif %}
                   {% if allmodules.Payment_out != Null %}
-                  <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                  <a href="{% url 'view_paymentout' %}" class="d-flex align-items-center gap-2 dropdown-item">
                     <!-- <i class="ti ti-mail fs-6"></i> -->
-                    <p class="mb-0 fs-3">Payment Out</p>
+                    <div class="d-flex">
+                      <p class="mb-0 fs-3">Payment Out</p>
+                      <a href="{% url 'add_paymentout' %}"><i class="fa fa-plus text-dark" ></i></a>
+                    </div>  
                   </a>
                   <hr>
                   {% endif %}

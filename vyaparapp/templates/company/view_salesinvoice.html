@@ -67,6 +67,112 @@
     
 </style>
 
+
+<style>
+    .custom-dropdown {
+        position: relative;
+        display: inline-block;
+        }
+
+        .dropdown-toggle {
+        padding: 10px;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        }
+
+        .dropdown-content {
+        z-index: 1;
+        display: none;
+        position: absolute;
+        top: 40px;
+        left: -95px;
+        background-color: #b4b4b450;
+        backdrop-filter: blur(5px);
+        padding: 10px;
+        border: 1px solid #3498db;
+        border-radius: 5px;
+        box-shadow: 3px 5px 5px 5px rgba(0, 0, 0, 0.201);
+        }
+
+        .dropdown-content input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        background-color: white;
+        border-radius: 5px;
+        border: 1px solid rgb(168, 168, 168);
+        }
+
+        .dropdown-content button {
+        padding: 8px 15px;
+        background-color: rgb(0, 154, 108);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 3px;
+        }
+
+        .custom-dropdown .dropdown-content .cls{
+            position: absolute;
+            right: -7px;
+            top: -7px;
+            padding: 3px 5px;
+            color: white;
+            text-shadow: 0px 0px 2px black ;
+            border-radius: 50%;
+            font-size: 15px;
+            background-color: rgba(255, 0, 0, 0.424);
+        }
+        .custom-dropdown .dropdown-content .title
+        {
+            background-color: rgb(255, 255, 255);
+            font-weight: 500;
+            color: rgb(0, 0, 0);
+            text-shadow: 0px 0px 20px rgb(255, 255, 255);
+            padding: 5px;
+            border-radius: 5px;
+        }
+        /* tooltip */
+        .tooltip {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted #ccc; /* Add a dotted underline for visual indication */
+        cursor: help; /* Change the cursor to a help cursor on hover */
+        }
+
+        .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -100px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+        }
+
+        .filter-option {
+        width: 100%;
+        padding: 5px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 1px;
+    }
+</style>
+
 {% if salesinvoice %}
 <div class="body-wrapper">
     <br><br><br>
@@ -105,7 +211,7 @@
                             </button>
                             
 
-                            <button class="btn p-0 ps-2 pe-2 ms-2" type="button" onclick="exportToExcel()">
+                            <button class="btn p-0 ps-2 pe-2 ms-2" type="button" onclick="ExportToExcel()">
                                 <span>
                                     <img width="22px" src="{% static 'images/excel2.png' %}" alt="Excel Icon">
                                     <br><span style="color: black; font-size: small; ">Export</span>
@@ -134,21 +240,21 @@
                     
                 </div>
 
-                <div class="row m-0" style="height:20%">
+                <div class="row m-0" id="calcdiv" style="height:20%">
                     <div class="d-flex " style="margin-top: 3rem;">
                         <div class="card bs p-3 mb-3" style="width: 10vw; height: 6vw; background-color: aquamarine;">
-                            <label for="" style="color: black; font-size: 15px;">Paid</label>
-                            <label for="" id="total-paidoff"  style="color: rgba(0, 0, 0, 0.774);"></label>
+                            <p for="" style="color: black; font-size: 15px;">Paid<br> &#8377;<span id="paidval"></span></p>
+                            {% comment %} <label for="" id="total-paidoff"  style="color: rgba(0, 0, 0, 0.774);"></label> {% endcomment %}
                         </div>
                         <b class="mt-2" style="font-size: 1.5rem;">+</b>
                         <div class="card bs p-3 mb-3" style="width: 11vw; height: 6vw; background-color: lightskyblue;">
-                            <label for="" style="color: black; font-size: 15px;">Unpaid</label>
-                            <label for="" id="total-balance"  style="color: rgba(0, 0, 0, 0.774);"></label>
+                            <p for="" style="color: black; font-size: 15px;">Unpaid<br> &#8377;<span id="unpaidval"></span></p>
+                            {% comment %} <label for="" id="total-balance"  style="color: rgba(0, 0, 0, 0.774);"></label> {% endcomment %}
                         </div>
                         <b class="mt-2" style="font-size: 1.5rem;">=</b>
                         <div class="card bs p-3 mb-3" style="width: 12vw; height: 6vw; background-color: rgba(255, 166, 0, 0.641)">
-                            <label for="" style="color: black; font-size: 15px;">Total</label>
-                            <label for="" id="grand_total" style="color: rgba(0, 0, 0, 0.774);"></label>
+                            <p for="" style="color: black; font-size: 15px;">Total<br> &#8377;<span id="totalval"></span></p>
+                            {% comment %} <label for="" id="grand_total" style="color: rgba(0, 0, 0, 0.774);"></label> {% endcomment %}
                         </div>
                     </div>
                 </div>
@@ -175,8 +281,8 @@
                             </div>
                             <div class="d-flex">
                                 <input id="search_input1" style="padding-inline-start: 2rem;" class="w-100 border-secondary text-dark pt-1 pb-1 pe-1 rounded" type="text" placeholder=" search here..">
-                                <a style="color: white;   height: 35px; margin-left: 20px;"
-                                    class="btn pt-2 btn-info" href="{% url 'add_salesinvoice' %}">Add
+                                <a style="color: white;   height: 35px; width: 150px; margin-left: 20px;"
+                                    class="btn pt-2 btn-info" href="{% url 'add_salesinvoice' %}">Add Invoice
                                     <!-- <i class="fa-solid fa fa-plus"></i> -->
                                 </a>
                 
@@ -184,16 +290,19 @@
                         </div>
                             <div class="mt-3" style="overflow: scroll;height: 31rem;">
                                 <table id="myTable" class="table table-bordered table-info table-striped tb table-responsive w-100">
-                                    <thead>
-                                        <th class="hide_field">#</th>
-                                        <th class="text-center fs-2">
-                                            <div class="heading-with-dropdown">
-                                                <span>DATE</span>
+                                    <thead >
+                                        <th class="hide_field no-export bg-secondary text-white" style="padding-right: 10px;">#</th>
+                                        <th class="text-center fs-2 bg-secondary text-white" >
+                                            <div class="heading-with-dropdown" >
+                                                <span style="margin-left: -10px;">DATE</span >
                                                 <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown1()"></span>
+                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown1()" style="margin-left: -12px;  width: 10px !important;"></span>
                                                     <div style="display: none;" class="dropdown-content dd1">
                                                         <span onclick="toggleDropdown1()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2 exact_match_0">EXACT MATCH</h6>
+                                                        <select class="filter-option">
+                                                            <option value="exact-match" selected>Equal to</option>
+                                                            
+                                                        </select><br>
                                                         <input id="dd1_input" type="text" placeholder="Enter something...">
                                                         <div class="d-flex">
                                                             <button class="me-2 clear_0" onclick="clear_input1()">CLEAR</button>
@@ -203,14 +312,17 @@
                                                 </div>
                                             </div>
                                         </th>
-                                        <th class="text-center fs-2">
+                                        <th class="text-center fs-2 bg-secondary text-white" style="padding-right: 10px;">
                                             <div class="heading-with-dropdown ">
-                                                <span style="white-space: nowrap;">INVOICE NO</span>
+                                                <span style="white-space: nowrap; margin-left: -10px; ">INVOICE NO</span>
                                                 <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown2()"></span>
+                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown2()" style="margin-left: -13px; width: 1px ;"></span>
                                                     <div style="display: none;" class="dropdown-content dd2">
                                                         <span onclick="toggleDropdown2()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2 exact_match_0">EXACT MATCH</h6>
+                                                        <select class="filter-option">
+                                                            <option value="exact-match" selected>Equal to</option>
+                                                            
+                                                        </select><br>
                                                         <input id="dd2_input" type="text" placeholder="Enter something...">
                                                         <div class="d-flex">
                                                             <button class="me-2 clear_0" onclick="clear_input2()">CLEAR</button>
@@ -221,14 +333,17 @@
                                             </div>
                                         </th>
                                       
-                                        <th class="text-center fs-2">
+                                        <th class="text-center fs-2 bg-secondary text-white" style="padding-right: 10px;">
                                             <div class="heading-with-dropdown">
-                                                <span style="white-space: nowrap;">PARTY NAME</span>
+                                                <span style="white-space: nowrap; margin-left: -10px;">PARTY NAME</span>
                                                 <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown3()"></span>
+                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown3()" style="margin-left: -13px; width: 1px !important;"></span>
                                                     <div style="display: none;" class="dropdown-content dd3">
                                                         <span onclick="toggleDropdown3()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2 exact_match_0">EXACT MATCH</h6>
+                                                        <select class="filter-option">
+                                                            <option value="exact-match" selected>Equal to</option>
+                                                            
+                                                        </select><br>
                                                         <input id="dd3_input" type="text" placeholder="Enter something...">
                                                         <div class="d-flex">
                                                             <button class="me-2 clear_0" onclick="clear_input3()">CLEAR</button>
@@ -238,14 +353,17 @@
                                                 </div>
                                             </div>
                                         </th>
-                                        <th class="text-center fs-2">
+                                        <th class="text-center fs-2 bg-secondary text-white" style="padding-right: 10px;">
                                             <div class="heading-with-dropdown">
-                                                <span>TRANSACTION</span>
+                                                <span style="margin-left: -10px;">TRANSACTION</span>
                                                 <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown4()"></span>
+                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown4()" style="margin-left: -13px; width: 1px !important;"></span>
                                                     <div style="display: none;" class="dropdown-content dd4">
                                                         <span onclick="toggleDropdown4()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2 exact_match_0">EXACT MATCH</h6>
+                                                        <select class="filter-option">
+                                                            <option value="exact-match" selected>Equal to</option>
+                                                            
+                                                        </select><br>
                                                         <input id="dd4_input" type="text" placeholder="Enter something...">
                                                         <div class="d-flex">
                                                             <button class="me-2 clear_0" onclick="clear_input4()">CLEAR</button>
@@ -255,14 +373,17 @@
                                                 </div>
                                             </div>
                                         </th>
-                                        <th class="text-center fs-2">
+                                        <th class="text-center fs-2 bg-secondary text-white" style="padding-right: 10px;">
                                             <div class="heading-with-dropdown">
-                                                <span style="white-space: nowrap;">PAYMENT TYPE</span>
+                                                <span style="white-space: nowrap; margin-left: -10px;">PAYMENT</span>
                                                 <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown5()"></span>
+                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown5()" style="margin-left: -10px; width: 1px !important;"></span>
                                                     <div style="display: none;" class="dropdown-content dd5">
                                                         <span onclick="toggleDropdown5()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2 exact_match_0">EXACT MATCH</h6>
+                                                        <select class="filter-option">
+                                                            <option value="exact-match" selected>Equal to</option>
+                                                            
+                                                        </select><br>
                                                         <input id="dd5_input" type="text" placeholder="Enter something...">
                                                         <div class="d-flex">
                                                             <button class="me-2 clear_0" onclick="clear_input5()">CLEAR</button>
@@ -272,14 +393,17 @@
                                                 </div>
                                             </div>
                                         </th>
-                                        <th class="text-center fs-2">
+                                        <th class="text-center fs-2 bg-secondary text-white" style="padding-right: 10px;">
                                             <div class="heading-with-dropdown">
-                                                <span>AMOUNT</span>
+                                                <span style="margin-left: -10px;">AMOUNT</span>
                                                 <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown6()"></span>
+                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown6()" style="margin-left: -13px; width: 1px !important;"></span>
                                                     <div style="display: none;" class="dropdown-content dd6">
                                                         <span onclick="toggleDropdown6()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2 exact_match_0">EXACT MATCH</h6>
+                                                        <select class="filter-option">
+                                                            <option value="exact-match" selected>Equal to</option>
+                                                            
+                                                        </select><br>
                                                         <input id="dd6_input" type="text" placeholder="Enter something...">
                                                         <div class="d-flex">
                                                             <button class="me-2 clear_0" onclick="clear_input6()">CLEAR</button>
@@ -289,14 +413,17 @@
                                                 </div>
                                             </div>
                                         </th>
-                                        <th class="text-center fs-2">
+                                        <th class="text-center fs-2 bg-secondary text-white" style="padding-right: 10px;">
                                             <div class="heading-with-dropdown">
-                                                <span style="white-space: nowrap;">BALANCE DUE</span>
+                                                <span style=" margin-left: -10px;">BALANCE</span>
                                                 <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown7()"></span>
+                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown7()" style="margin-left: -12px; width: 1px !important;"></span>
                                                     <div style="display: none;" class="dropdown-content dd7">
                                                         <span onclick="toggleDropdown7()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2 exact_match_0">EXACT MATCH</h6>
+                                                        <select class="filter-option">
+                                                            <option value="exact-match" selected>Equal to</option>
+                                                            
+                                                        </select><br>
                                                         <input id="dd7_input" type="text" placeholder="Enter something...">
                                                         <div class="d-flex">
                                                             <button class="me-2 clear_0" onclick="clear_input7()">CLEAR</button>
@@ -306,14 +433,17 @@
                                                 </div>
                                             </div>
                                         </th>
-                                        <th class="text-center fs-2">
+                                        <th class="text-center fs-2 no-export bg-secondary text-white" style="padding-right: 10px;">
                                             <div class="heading-with-dropdown">
-                                                <span>ACTION</span>
+                                                <span style="margin-left: -10px;">ACTION</span>
                                                 <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown8()"></span>
+                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown8()" style="margin-left: -13px; width: 1px !important;"></span>
                                                     <div style="display: none;" class="dropdown-content dd8">
                                                         <span onclick="toggleDropdown8()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2 exact_match_0">EXACT MATCH</h6>
+                                                        <select class="filter-option">
+                                                            <option value="exact-match" selected>Equal to</option>
+                                                            
+                                                        </select><br>
                                                         <input id="dd8_input" type="text" placeholder="Enter something...">
                                                         <div class="d-flex">
                                                             <button class="me-2 clear_0" onclick="clear_input8()">CLEAR</button>
@@ -323,14 +453,17 @@
                                                 </div>
                                             </div>
                                         </th>
-                                        <th class="text-center fs-2">
+                                        <th class="text-center fs-2 no-export bg-secondary text-white" style="padding-right: 10px;">
                                             <div class="heading-with-dropdown">
-                                                <span>BY</span>
+                                                <span style="margin-left: -10px; ">BY</span>
                                                 <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown9()"></span>
+                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown9()" style="margin-left: -13px; width: 1px;"></span>
                                                     <div style="display: none;" class="dropdown-content dd9">
                                                         <span onclick="toggleDropdown9()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2 exact_match_0">EXACT MATCH</h6>
+                                                        <select class="filter-option">
+                                                            <option value="exact-match" selected>Equal to</option>
+                                                            
+                                                        </select><br>
                                                         <input id="dd9_input" type="text" placeholder="Enter something...">
                                                         <div class="d-flex">
                                                             <button class="me-2 clear_0" onclick="clear_input9()">CLEAR</button>
@@ -340,13 +473,13 @@
                                                 </div>
                                             </div>
                                         </th>
-                                        <th class="text-center p-0 m-0 no-export"></th> 
+                                        <th class="text-center p-0 m-0 no-export bg-secondary text-white" style="padding-right: 10px;"></th> 
                                     </thead>
                
                                     <tbody>
                                         {% for s in salesinvoice %}
                                             <tr class="sales-row">
-                                                <td class="text-center hide_field" style="padding-top: 1.4rem;">
+                                                <td class="text-center hide_field no-export" style="padding-top: 1.4rem;">
                                                     <div style="width: 10px;height: 10px;" class="bg-dark rounded-pill bs_sm"></div>
                                                 </td>                                                
                                                 <td class="text-center date-cell td_date">{{s.date|date:"Y-m-d"}}</td>
@@ -356,8 +489,9 @@
                                                 <td class="text-center td_payment">{{ s.paymenttype }}</td>
                                                 <td class="text-center td_amount">{{s.grandtotal}}</td>
                                                 <td class="text-center td_balance">{{ s.totalbalance }}</td>
-                                                <td class="text-center td_action">{{ s.action }}</td>
-                                                <td class="text-center td_by">{{s.done_by_name}}</td>
+                                                <td class="text-center td_action no-export">{{ s.action }}</td>
+                                                <td class="text-center td_by no-export">{{s.done_by_name}}</td>
+                                                <td class="text-center td_paidoff no-export" hidden>{{s.paidoff}}</td>
                                                 <td class="p-0 pt-1 m-0 no-export">
                                                   <div class="btn-group mb-1">
                                                         <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
@@ -398,9 +532,9 @@
 {% comment %} <p id="emptyMessage" style="text-align: center;">
     <br><br><br>
     No Transactions to Show
-</p>
+</p>{% endcomment %}
 
-<table id="excelbilltable" hidden>
+<table id="excelinvoicetable" hidden>
     <thead >
         <tr class="fs-2 tb" >
             <th> DATE </th>
@@ -425,7 +559,7 @@
         </tr>
         {% endfor %}
     </tbody>
-</table> {% endcomment %}
+</table> 
 
 <table id="tablemodel" hidden>
     <thead>
@@ -642,14 +776,19 @@
     function printTable() {
         // Get the table element by its ID
         var table = document.getElementById('myTable');
+        
 
         // Exclude the last column (ACTION) from export
         var noExportCols = Array.from(table.querySelectorAll('th.no-export, td.no-export'));
         noExportCols.forEach(col => col.style.display = 'none');
 
+        
+
         // Open a new window and write the table HTML content to it
         var newWin = window.open('', 'Print-Window');
         newWin.document.open();
+        newWin.document.write('<html><head><style>@media print {table {width: 100%;border-collapse: collapse;} th, td {border: 1px solid #000; padding: 8px;}} </style></head><body>');
+        newWin.document.write('<h1>Sales Invoice</h1>');
         newWin.document.write('<html><head><style>@media print {table {width: 100%;border-collapse: collapse;} th, td {border: 1px solid #000; padding: 8px;}}</style></head><body>' + table.outerHTML + '</body></html>');
         newWin.document.close();
 
@@ -661,45 +800,36 @@
     }
 </script>
 
+
+
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.10/xlsx.full.min.js"></script>
 
 
 <script>
 
-    function exportToExcel() {
-        $('.exact_match_0').text('');
-        $('.clear_0').text('');
-        $('.sbmit_0').text('');
-        $('.hide_table_text_v').text('');
-        $('.hide_table_text_e').text('');
-        $('.hide_table_text_d').text('');
-        $('.hide_table_text_h').text('');
-        // $('.show_bank_id').attr('hidden', false);
-        $('.hide_field').remove();
+
+    function ExportToExcel() {
+        const table = document.querySelector('#excelinvoicetable');
+        const ws = XLSX.utils.table_to_sheet(table);
     
-        const table = document.getElementById('myTable');
-        const wsData = XLSX.utils.table_to_sheet(table);
-        
-        // Set date format for the 'date-cell' column
-        const dateColumn = 'A';  // Assuming 'date-cell' is the second column (adjust accordingly)
-        wsData['!cols'] = [{ wch: 10 }, { wch: 10 }, /* ... add more if needed ... */ ];
-    
-        wsData[dateColumn + '1'].z = 'yyyy-mm-dd';  // Set the desired date format
+        // Specify column widths (in Excel characters, e.g., "15px")
+        ws['!cols'] = [
+            { wch: 12 }, // DATE
+            { wch: 15 }, // INVOICE NO
+            { wch: 20 }, // PARTY NAME
+            { wch: 15 }, // TRANSCATION
+            { wch: 15 }, // PAYMENT TYPE
+            { wch: 12 }, // AMOUNT
+            { wch: 15 }, // BALANCE DUE
+        ];
     
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, wsData, 'Sheet1');
-        XLSX.writeFile(wb, 'table_data.xlsx');
-    
-        $('.exact_match_0').text('EXACT MATCH');
-        $('.clear_0').text('CLEAR');
-        $('.sbmit_0').text('SUBMIT');
-        $('.hide_table_text_v').html('<span class="fa fa-eye pe-2 tg"></span>  view');
-        $('.hide_table_text_e').html('<span class="fas fa-edit pe-2 text-primary mt-2"></span> Edit');
-        $('.hide_table_text_d').html(' <span class="fa fa-trash-alt pe-2 tr mt-2"></span>  Delete');
-        $('.hide_table_text_h').html('<span class="fa fa-history pe-2 th mt-2"></span>  History');
-    
-        window.location.href = '';
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        XLSX.writeFile(wb, 'SalesInvoice.xlsx');
     }
+    
+ 
     
 
     $(document).ready(function() {
@@ -730,7 +860,7 @@
  
 </script>
 
-<script>
+{% comment %} <script>
 
     function updateTotalBalance() {
         $.ajax({
@@ -747,7 +877,37 @@
         });
     }
     updateTotalBalance();
+</script> {% endcomment %}
+
+<script>
+    calculatetotal()
+
+    function calculatetotal() {
+        var table = document.getElementById('myTable');
+        var rows = table.getElementsByTagName('tr');
+        var tpaid = 0;
+        var tunpaid = 0;
+        var ttotal = 0;
+    
+        for (var i = 1; i < rows.length; i++) {
+            if (rows[i].style.display != 'none') {
+                var paidCell = rows[i].querySelector('.td_paidoff'); 
+                var unpaidCell = rows[i].querySelector('.td_balance'); 
+                var totalCell = rows[i].querySelector('.td_amount'); 
+    
+                tpaid += parseFloat(paidCell.textContent) || 0;
+                tunpaid += parseFloat(unpaidCell.textContent) || 0;
+                ttotal += parseFloat(totalCell.textContent) || 0;
+            }
+        }
+    
+        document.getElementById('paidval').textContent = tpaid.toFixed(2);
+        document.getElementById('unpaidval').textContent = tunpaid.toFixed(2);
+        document.getElementById('totalval').textContent = ttotal.toFixed(2);
+    }
+    
 </script>
+
 <script>
 // custom dropdown1
 function toggleDropdown1() 

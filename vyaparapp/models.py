@@ -358,15 +358,15 @@ class SalesInvoice(models.Model):
     upi = models.CharField(max_length=255,null=True,blank=True)
     accountno = models.CharField(max_length=255,null=True,blank=True)
     description = models.TextField(max_length=255,null=True,blank=True)
-    subtotal = models.DecimalField(max_digits=20, decimal_places=2, default=0.00,null=True,blank=True)
-    igst = models.DecimalField(max_digits=20, decimal_places=2, default=0.00,null=True,blank=True)
-    cgst = models.DecimalField(max_digits=20, decimal_places=2, default=0.00,null=True,blank=True)
-    sgst = models.DecimalField(max_digits=20, decimal_places=2, default=0.00,null=True,blank=True)
-    total_taxamount = models.DecimalField(max_digits=20, decimal_places=2, default=0.00,null=True,blank=True)
-    adjustment = models.DecimalField(max_digits=20, decimal_places=2, default=0.00,null=True,blank=True)
-    grandtotal = models.DecimalField(max_digits=20, decimal_places=2, default=0.00,null=True,blank=True)
-    paidoff = models.IntegerField(default=0,null=True,blank=True)
-    totalbalance = models.DecimalField(max_digits=20, decimal_places=2, default=0.00,null=True,blank=True)
+    subtotal = models.IntegerField(default=0, null=True)
+    igst = models.CharField(max_length=100,default=0, null=True)
+    cgst = models.CharField(max_length=100,default=0, null=True)
+    sgst = models.CharField(max_length=100,default=0, null=True)
+    total_taxamount = models.CharField(max_length=100,default=0)
+    adjustment = models.CharField(max_length=100,default=0)
+    grandtotal = models.FloatField(default=0, null=True)
+    paidoff = models.CharField(null=True,blank=True,max_length=255)
+    totalbalance = models.CharField(null=True,blank=True,max_length=255)
 
 
 class SalesInvoiceItem(models.Model):
@@ -577,7 +577,7 @@ class sales_item(models.Model):
     tax = models.CharField(max_length=100,null=True)
     
 
-class sale_transaction(models.Model):
+class saleorder_transaction(models.Model):
     sales_order = models.ForeignKey(salesorder,on_delete=models.CASCADE,blank=True,null=True)
     staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
     company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
@@ -586,6 +586,41 @@ class sale_transaction(models.Model):
     
 #End
 
+# ==============Anuvinda K V ============payment out=======
+class PaymentOut(models.Model):
+    purchase=models.ForeignKey(PurchaseBill,on_delete=models.CASCADE,null=True,blank=True)
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,null=True,blank=True)
+    company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
+    party = models.ForeignKey(party, on_delete=models.CASCADE)
+    billno = models.IntegerField(default=0,null=True,blank=True)
+    billdate = models.DateField()
+    duedate = models.DateField(null=True,blank=True)
+    pay_method = models.CharField(max_length=255, default='', null=True)
+    cheque_no = models.CharField(max_length=255, default='', null=True)
+    upi_no = models.CharField(max_length=255, default='', null=True)
+    balance=models.CharField(null=True,blank=True,max_length=255)
+    tot_bill_no = models.IntegerField(default=0, null=True)
+    def paymentout_history(self):
+        return PaymentOutHistory.objects.filter(paymentout=self).order_by('-timestamp')
+        
+class PaymentOutDetails(models.Model):
+    paymentout = models.ForeignKey('PaymentOut',on_delete=models.CASCADE,null=True,blank=True)
+    paid = models.DecimalField(max_digits=10, decimal_places=2,null=True)
+    description = models.TextField(null=True)
+    files = models.FileField(upload_to='paymentout_files/', null=True, blank=True)
+
+    def __str__(self):
+        return str(self.paymentout) 
+
+class PaymentOutHistory(models.Model):
+    paymentout = models.ForeignKey(PaymentOut, on_delete=models.CASCADE)
+    action = models.CharField(max_length=10)  # 'created' or 'updated'
+    timestamp = models.DateTimeField(auto_now_add=True)
+    # Add any additional fields you want to track in the history
+
+    def __str__(self):
+        return f"{self.paymentout.billno} - {self.action} - {self.timestamp}"    
+#End
 
 # ==============Payment In============shemeem=============================
 
@@ -627,4 +662,4 @@ class PaymentInTransactionHistory(models.Model):
     action = models.CharField(max_length=20, choices=CHOICES,null=True)
     date = models.DateField(null=True,blank=True)
 
-#------------------------------------end-------------------------------------------------    
+#------------------------------------end-------------------------------------------------

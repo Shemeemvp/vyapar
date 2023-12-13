@@ -240,7 +240,7 @@ urlpatterns = [
     path('itemdetail',views.itemdetail,name='itemdetail'),
     path('create_debitnotes',views.create_debitnotes,name='create_debitnotes'),
     path('purchasebilldata',views.purchasebilldata,name='purchasebilldata'),
-    path('purchasebilldatas',views.purchasebilldatas,name='purchasebilldatas'),
+    
     path('bankdata1',views.bankdata1,name='bankdata1'),
     path('delete_debit/<int:id>',views.delete_debit,name='delete_debit'),
     path('edit_debitnote/<int:id>',views.edit_debitnote,name='edit_debitnote'),
@@ -298,7 +298,37 @@ urlpatterns = [
     path('saleorderto_invoice/<int:id>', views.saleorderto_invoice, name='saleorderto_invoice'),
     path('saleorder_convert/<int:sid>', views.saleorder_convert, name='saleorder_convert'),
     #End
-
+    
+    path('get_bill_date',views.get_bill_date,name='get_bill_date'),
+    
+    #salesinvoiceurl(new)
+    path('item_save_invoice', views.item_save_invoice, name='item_save_invoice'),
+    path('item_invoicedropdown', views.item_invoicedropdown, name='item_invoicedropdown'),
+    #End
+    
+    path('expense_cat_dropdown',views.expense_cat_dropdown,name='expense_cat_dropdown'),
+    
+    # =========== payment out=========== Anuvinda - start =======================================
+     path('view_paymentout',views.view_paymentout,name='view_paymentout'),
+     path('add_paymentout',views.add_paymentout,name='add_paymentout'),
+     path('create_paymentout',views.create_paymentout,name='create_paymentout'),
+     path('delete_paymentout/',views.delete_paymentout,name='delete_paymentout'), 
+     path('details_paymentout/<int:id>/', views.details_paymentout, name='details_paymentout'),
+     path('edit_paymentout/<int:id>/',views.edit_paymentout, name='edit_paymentout'),
+     path('add_pay/',views.add_pay, name='add_pay'),
+     path('create_addpaymentout',views.create_addpaymentout,name='create_addpaymentout'), 
+     path('update_paymentout/<int:id>/', views.update_paymentout, name='update_paymentout'),
+     path('paymentout_history/<int:id>/',views.paymentout_history, name='paymentout_history'),
+     #End
+     
+     # =====================================gstr-3B gstr9 AKSHAYA ===============================================================
+    
+    path('gstr3b',views.gstr3b, name='gstr3b'),
+    path('sharegstr3BToEmail',views.sharegstr3BToEmail, name='sharegstr3BToEmail'),
+    path('gstr9',views.gstr9, name='gstr9'),
+    path('sharegstr9ToEmail',views.sharegstr9ToEmail, name='sharegstr9ToEmail'),
+    #End
+    
     #______________Payment In__________________shemeem________________________________
     path('listout_paymentin',views.paymentIn, name='paymentIn'),
     path('create_payment_in',views.createPaymentIn,name='createPaymentIn'),

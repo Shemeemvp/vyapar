@@ -383,31 +383,32 @@
                                                             </div>
                                                             <div class="col-sm-4 m-0 p-0"></div>
                                                         </div>
-                                                    {% else %}
-                                                        <div class="row container-fluid p-2 m-0" style="display: none;" id="cgst1">
-                                                            <div class="col-sm-4 mt-2"><label for="a" class="text-center">CGST</label></div>
-                                                            <div class="col-sm-1 mt-2">:</div>
-                                                            <div class="col-sm-7">
-                                                                <input type="number" name='cgst' step="any" id="cgst"  value="{{pdebt.cgst}}"style="color: black; background-color: white;" readonly class="form-control"/>
-                                                            </div>
-                                                            <div class="col-sm-4 m-0 p-0"></div>
+                                                        {%endif%}
+                                                    {% if pdebt.supply  == 'Other State' %}
+                                                    <div class="row container-fluid p-2 m-0" id="cgstdiv" style="display: none;">
+                                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">CGST</label></div>
+                                                        <div class="col-sm-1 mt-2">:</div>
+                                                        <div class="col-sm-7">
+                                                            <input type="number" name='cgst' step="any" id="cgst"  value="{{pdebt.cgst}}"style="color: black; background-color: white;" readonly class="form-control"/>
                                                         </div>
-                                                        <div class="row container-fluid p-2 m-0" style="display: none;" id="sgst1">
-                                                            <div class="col-sm-4 mt-2"><label for="a" class="text-center">SGST</label></div>
-                                                            <div class="col-sm-1 mt-2">:</div>
-                                                            <div class="col-sm-7">
-                                                                <input type="number" name='sgst' step="any" id="sgst" value="{{pdebt.sgst}}"style="color: black; background-color: white;" readonly class="form-control"/>
-                                                            </div>
-                                                            <div class="col-sm-4 m-0 p-0"></div>
+                                                        <div class="col-sm-4 m-0 p-0"></div>
+                                                    </div>
+                                                    <div class="row container-fluid p-2 m-0"  id="sgstdiv" style="display: none;">
+                                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">SGST</label></div>
+                                                        <div class="col-sm-1 mt-2">:</div>
+                                                        <div class="col-sm-7">
+                                                            <input type="number" name='sgst' step="any" id="sgst" value="{{pdebt.sgst}}"style="color: black; background-color: white;" readonly class="form-control"/>
                                                         </div>
-                                                        <div class="row container-fluid p-2 m-0" id="igst1">
-                                                            <div class="col-sm-4 mt-2"><label for="a" class="text-center">IGST</label></div>
-                                                            <div class="col-sm-1 mt-2">:</div>
-                                                            <div class="col-sm-7">
-                                                                <input type="number" name='igst' step="any" id="igst" value="{{pdebt.igst}}"style="color: black; background-color: white;" readonly class="form-control"/>
-                                                            </div>
-                                                            <div class="col-sm-4 m-0 p-0"></div>
+                                                        <div class="col-sm-4 m-0 p-0"></div>
+                                                    </div>
+                                                    <div class="row container-fluid p-2 m-0"  id="igstdiv">
+                                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">IGST</label></div>
+                                                        <div class="col-sm-1 mt-2">:</div>
+                                                        <div class="col-sm-7">
+                                                            <input type="number" name='igst' step="any" id="igst" value="{{pdebt.igst}}"style="color: black; background-color: white;" readonly class="form-control"/>
                                                         </div>
+                                                        <div class="col-sm-4 m-0 p-0"></div>
+                                                    </div>
                                                     {% endif %}
                                                     <div class="row container-fluid p-2 m-0">
                                                         <div class="col-sm-4 mt-2"><label for="a" class="text-center">Tax Amount</label></div>
@@ -1342,6 +1343,7 @@
 });
 
 $(document).ready(function () {
+    // Event listener for the 'customer' dropdown
     $('#customer').on('change', function () {
         var customerId = $('#customer').val();
 
@@ -1353,15 +1355,13 @@ $(document).ready(function () {
                 csrfmiddlewaretoken: '{{ csrf_token }}',
             },
             success: function (data) {
-                // Clear existing options in the dropdown
+                // Clear existing options in the dropdowns
                 $('#bill_no').empty();
                 $('#billdate').empty();
 
-                // Check if data contains bill numbers and dates
                 if (data.bill_numbers && data.bill_dates) {
-                    // Iterate through the data and append options to the dropdown
                     for (var i = 0; i < data.bill_numbers.length; i++) {
-                        var optionText = data.bill_numbers[i] ;
+                        var optionText = data.bill_numbers[i];
                         var optionTexts = data.bill_dates[i];
                         $('#bill_no').append($('<option>', {
                             value: data.bill_numbers[i],
@@ -1373,7 +1373,6 @@ $(document).ready(function () {
                         }));
                     }
                 } else {
-                    // If no bill numbers and dates, add a default option
                     $('#bill_no').append($('<option>', {
                         value: 'No bill',
                         text: 'No bills available'
@@ -1386,7 +1385,42 @@ $(document).ready(function () {
             }
         });
     });
+
+    // Event listener for the 'bill_no' dropdown
+    $('#bill_no').on('change', function () {
+        var selectedBillNo = $(this).val();
+        console.log(selectedBillNo)
+
+        // Make another AJAX request to get the date for the selected bill number
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'get_bill_date' %}",  // Replace with the actual URL to fetch date
+            data: {
+                bill_no: selectedBillNo,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function (dateData) {
+                // Clear existing options in the 'billdate' dropdown
+                $('#billdate').empty();
+
+                if (dateData && dateData.bill_date) {
+                    // Append the date option to the 'billdate' dropdown
+                    $('#billdate').append($('<option>', {
+                        value: dateData.bill_date,
+                        text: dateData.bill_date
+                    }));
+                } else {
+                    // If no date is available, add a default option
+                    $('#billdate').append($('<option>', {
+                        value: 'No date',
+                        text: 'No date available'
+                    }));
+                }
+            }
+        });
+    });
 });
+
 
     $(document).ready(function(){
         $('#add').click(function(){
