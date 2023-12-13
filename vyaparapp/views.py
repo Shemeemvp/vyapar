@@ -8091,5 +8091,369 @@ def importPaymentFromExcel(request):
     if incorrect_data:
       messages.warning(request, f'Data with following Sl No could not import due to incorrect data provided - {", ".join(str(item) for item in incorrect_data)}')
     return redirect(paymentIn)
+
+
+def convertEstimateToSalesOrder(request,id):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']           
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    allmodules= modules_list.objects.get(company=staff.company,status='New')
+    cmp = company.objects.get(id=staff.company.id)
+    par= party.objects.filter(company=cmp)
+    item = ItemModel.objects.filter(company=cmp)
+    bnk = BankModel.objects.filter(company=cmp)
+    estimate = Estimate.objects.get(id = id)
+    est_items = Estimate_items.objects.filter(eid = estimate)
+    order = salesorder.next_orderno()
+    
+    context={
+      'party':par,'item':item,'staff':staff,'order':order,'bnk':bnk,'allmodules':allmodules,'estimate':estimate, 'est_items':est_items,
+    }
+    return render(request, 'company/estimate_to_salesorder.html',context)
+
+
+def saveEstimateToSalesOrder(request,id):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+           
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    estimate = Estimate.objects.get(id = id)
+    if request.method == 'POST':
+      prty = request.POST.get('party')
+      cmp= staff.company
+      payment = request.POST.get('paymethode')
+      pos=request.POST.get('stateofsply')
+      attach=request.FILES.get('attach')       
+
+      sale = salesorder(
+        partyname=prty,
+        orderno=request.POST.get('orderno'),
+        orderdate=request.POST.get('orderdate'),
+        duedate=request.POST.get('duedate'),
+        placeofsupply=pos,
+        payment_method=payment,
+        subtotal=request.POST.get('subtotal'),
+        taxamount=request.POST.get('taxamount'),
+        adjustment=request.POST.get('adj'),
+        grandtotal=request.POST.get('grandtotal'),
+        note=request.POST.get('note'),
+        paid=request.POST.get('paid'),
+        balance=request.POST.get('baldue'),
+        file=attach,
+        staff=staff,
+        comp=cmp,
+      )
+
+      if payment == 'Cheque':
+        sale.checkno = request.POST.get('checkno')
+      elif payment == 'UPI':
+        sale.UPI = request.POST.get('upiid')
+      elif payment != 'Cheque' and payment != 'UPI 'and payment != 'Cash':
+        sale.accno = request.POST.get('accno')
+      
+      if pos == 'state':
+        sale.CGST=request.POST.get('cgst')
+        sale.SGST=request.POST.get('sgst')
+      elif pos == 'other state':
+        sale.IGST=request.POST.get('igst')
+
+      sale.save()
+      
+      product = request.POST.getlist("product[]")
+      hsn  = request.POST.getlist("hsn[]")
+      qty = request.POST.getlist("qty[]")
+      price = request.POST.getlist("price[]")
+      tax = request.POST.getlist("tax1[]")
+      discount = request.POST.getlist("discount[]")
+      total = request.POST.getlist("total[]")
+      salesorderid=salesorder.objects.get(id =sale.id)
+    
+      if len(product)==len(hsn)==len(qty) ==len(price)==len(tax)==len(discount)==len(total):
+        mapped = zip(product, hsn, qty, price, tax, discount, total)
+        mapped = list(mapped)
+        for ele in mapped:
+          print(ele[0])
+          prod=ItemModel.objects.get(id=ele[0])
+          salesorderAdd = sales_item(
+            product=prod,
+            hsn=ele[1],
+            qty=ele[2],
+            price=float(ele[3]),
+            tax=ele[4],
+            discount=float(ele[5]),
+            total=float(ele[6]),
+            sale_order=salesorderid,
+            cmp=staff.company
+          )
+          salesorderAdd.save()
+
+      tran= saleorder_transaction(
+        sales_order=salesorderid,staff=staff,company=cmp,action="Created",date=date.today()
+      )
+      tran.save()
+
+      estimate.status = 'Completed'
+      estimate.is_converted = True
+      estimate.balance = sale.balance
+      estimate.save()
+
+
+      return redirect(estimate_quotation)
+
+
+def convertEstimateToInvoice(request,id):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']           
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    company_instance = company.objects.get(id=staff.company.id)
+
+    Party=party.objects.filter(company=company_instance)
+    item=ItemModel.objects.filter(company=company_instance)
+    allmodules= modules_list.objects.get(company=staff.company.id,status='New')
+    bank=BankModel.objects.filter(company=company_instance)
+    if SalesInvoice.objects.filter(company=company_instance).exists():
+          invoice_count = SalesInvoice.objects.last().invoice_no
+          next_count = invoice_count+1
+    else:
+          next_count=1
+    estimate = Estimate.objects.get(id = id)
+    est_items = Estimate_items.objects.filter(eid = estimate)
+    
+    context={
+      'staff':staff,'Party':Party,'item':item,'bank':bank,'count':next_count,'allmodules':allmodules,'estimate':estimate, 'est_items':est_items,
+    }
+    return render(request, 'company/estimate_to_invoice.html',context)
+
+
+def saveEstimateToInvoice(request,id):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+           
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    estimate = Estimate.objects.get(id = id)
+    company_instance = staff.company
+    if request.method == 'POST':
+      party_name = request.POST.get('partyname')
+      contact = request.POST.get('contact')
+      address = request.POST.get('address')
+      invoice_no = request.POST.get('invoiceno')
+      date = request.POST.get('date')
+      state_of_supply = request.POST.get('state_of_supply')
+      paymenttype = request.POST.get('bank')
+      cheque = request.POST.get('chequeNumber')
+      upi = request.POST.get('upiNumber')
+      accountno = request.POST.get('accountNumber')
+      product = tuple(request.POST.getlist("product[]"))
+      hsn =  tuple(request.POST.getlist("hsn[]"))
+      qty =  tuple(request.POST.getlist("qty[]"))
+      rate =  tuple(request.POST.getlist("price[]"))
+      discount =  tuple(request.POST.getlist("discount[]"))
+      tax =  tuple(request.POST.getlist("tax[]"))
+      total =  tuple(request.POST.getlist("total[]"))
+      description = request.POST.get('description')
+      advance = request.POST.get("advance")
+      balance = request.POST.get("balance")
+      subtotal = float(request.POST.get('subtotal'))
+      igst = request.POST.get('igst')
+      cgst = request.POST.get('cgst')
+      sgst = request.POST.get('sgst')
+      adjust = request.POST.get("adj")
+      taxamount = request.POST.get("taxamount")
+      grandtotal=request.POST.get('grandtotal')
+
+      party_instance=party.objects.get(party_name=party_name)
+      
+    
+      sales_invoice = SalesInvoice(
+        staff=staff,
+        company=company_instance,
+        party=party_instance,
+        party_name=party_name,
+        contact=contact,
+        address=address,
+        invoice_no=invoice_no,
+        date=date,
+        state_of_supply=state_of_supply,
+        paymenttype=paymenttype,
+        cheque=cheque,
+        upi=upi,
+        accountno=accountno,
+        description=description,
+        subtotal=subtotal,
+        igst=igst,
+        cgst=cgst,
+        sgst=sgst,
+        total_taxamount=taxamount,
+        adjustment=adjust,
+        grandtotal=grandtotal,
+        paidoff=advance,
+        totalbalance=balance,
+      )
+
+      sales_invoice.save()
+
+      tr_history = SalesInvoiceTransactionHistory(
+        company=company_instance,
+        staff=staff,      
+        salesinvoice=sales_invoice,
+        action="CREATED",
+        done_by_name=staff.first_name,
+      )
+      tr_history.save()
+
+      invoice = SalesInvoice.objects.get(id=sales_invoice.id)
+      mapped = []  # Initialize mapped
+      if len(product)==len(hsn)==len(qty)==len(rate)==len(discount)==len(tax)==len(total):
+        mapped=zip(product, hsn, qty, rate, discount, tax, total)
+        mapped=list(mapped)
+        for ele in mapped: 
+          itm = ItemModel.objects.get(id=ele[0])
+          SalesInvoiceItem.objects.create(item=itm, hsn=ele[1], quantity=ele[2], rate=float(ele[3]), discount=float(ele[4]), tax=ele[5], totalamount=float(ele[6]), salesinvoice=invoice, company=company_instance)
+      
+
+      estimate.status = 'Completed'
+      estimate.is_converted = True
+      estimate.balance = sales_invoice.totalbalance
+      estimate.save()
+
+      return redirect(estimate_quotation)
+
+
+def convertChallanToInvoice(request,id):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']           
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    company_instance = company.objects.get(id=staff.company.id)
+
+    Party=party.objects.filter(company=company_instance)
+    item=ItemModel.objects.filter(company=company_instance)
+    allmodules= modules_list.objects.get(company=staff.company.id,status='New')
+    bank=BankModel.objects.filter(company=company_instance)
+    if SalesInvoice.objects.filter(company=company_instance).exists():
+          invoice_count = SalesInvoice.objects.last().invoice_no
+          next_count = invoice_count+1
+    else:
+          next_count=1
+    challan = DeliveryChallan.objects.get(id = id)
+    ch_items = DeliveryChallanItems.objects.filter(cid = challan)
+    
+    context={
+      'staff':staff,'Party':Party,'item':item,'bank':bank,'count':next_count,'allmodules':allmodules,'challan':challan, 'ch_items':ch_items,
+    }
+    return render(request, 'company/challan_to_invoice.html',context)
+
+
+def saveChallanToInvoice(request,id):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+           
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    challan = DeliveryChallan.objects.get(id = id)
+    company_instance = staff.company
+    if request.method == 'POST':
+      party_name = request.POST.get('partyname')
+      contact = request.POST.get('contact')
+      address = request.POST.get('address')
+      invoice_no = request.POST.get('invoiceno')
+      date = request.POST.get('date')
+      state_of_supply = request.POST.get('state_of_supply')
+      paymenttype = request.POST.get('bank')
+      cheque = request.POST.get('chequeNumber')
+      upi = request.POST.get('upiNumber')
+      accountno = request.POST.get('accountNumber')
+      product = tuple(request.POST.getlist("product[]"))
+      hsn =  tuple(request.POST.getlist("hsn[]"))
+      qty =  tuple(request.POST.getlist("qty[]"))
+      rate =  tuple(request.POST.getlist("price[]"))
+      discount =  tuple(request.POST.getlist("discount[]"))
+      tax =  tuple(request.POST.getlist("tax[]"))
+      total =  tuple(request.POST.getlist("total[]"))
+      description = request.POST.get('description')
+      advance = request.POST.get("advance")
+      balance = request.POST.get("balance")
+      subtotal = float(request.POST.get('subtotal'))
+      igst = request.POST.get('igst')
+      cgst = request.POST.get('cgst')
+      sgst = request.POST.get('sgst')
+      adjust = request.POST.get("adj")
+      taxamount = request.POST.get("taxamount")
+      grandtotal=request.POST.get('grandtotal')
+
+      party_instance=party.objects.get(party_name=party_name)
+      
+    
+      sales_invoice = SalesInvoice(
+        staff=staff,
+        company=company_instance,
+        party=party_instance,
+        party_name=party_name,
+        contact=contact,
+        address=address,
+        invoice_no=invoice_no,
+        date=date,
+        state_of_supply=state_of_supply,
+        paymenttype=paymenttype,
+        cheque=cheque,
+        upi=upi,
+        accountno=accountno,
+        description=description,
+        subtotal=subtotal,
+        igst=igst,
+        cgst=cgst,
+        sgst=sgst,
+        total_taxamount=taxamount,
+        adjustment=adjust,
+        grandtotal=grandtotal,
+        paidoff=advance,
+        totalbalance=balance,
+      )
+
+      sales_invoice.save()
+
+      tr_history = SalesInvoiceTransactionHistory(
+        company=company_instance,
+        staff=staff,      
+        salesinvoice=sales_invoice,
+        action="CREATED",
+        done_by_name=staff.first_name,
+      )
+      tr_history.save()
+
+      invoice = SalesInvoice.objects.get(id=sales_invoice.id)
+      mapped = []  # Initialize mapped
+      if len(product)==len(hsn)==len(qty)==len(rate)==len(discount)==len(tax)==len(total):
+        mapped=zip(product, hsn, qty, rate, discount, tax, total)
+        mapped=list(mapped)
+        for ele in mapped: 
+          itm = ItemModel.objects.get(id=ele[0])
+          SalesInvoiceItem.objects.create(item=itm, hsn=ele[1], quantity=ele[2], rate=float(ele[3]), discount=float(ele[4]), tax=ele[5], totalamount=float(ele[6]), salesinvoice=invoice, company=company_instance)
+      
+
+      challan.status = 'Completed'
+      challan.is_converted = True
+      challan.balance = sales_invoice.totalbalance
+      challan.invoice = SalesInvoice.objects.get(id = sales_invoice.id)
+      challan.save()
+
+      return redirect(delivery_challan)
+
     
 #End

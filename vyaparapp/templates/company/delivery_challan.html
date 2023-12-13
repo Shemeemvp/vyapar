@@ -358,15 +358,20 @@
                                 <td>{{i.history.action}}</td>
                                 <td>{{i.history.staff.first_name| capfirst}}</td>
                                 <td class="p-0 pt-1 m-0">
-                                    <div class="btn-group">
+                                    {% if i.challan.is_converted %}
+                                    <span class="text-info fw-bolder text-center" onclick="window.location.href='/salesinvoice_billtemplate/{{i.challan.invoice.id}}'">Converted to Invoice - {{i.challan.invoice.invoice_no}}</span>
+                                    {% else %}
+                                    <div class="btn-group px-2">
                                         <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                             Convert
                                         </button>
                                         <ul class="dropdown-menu">
-                                          <li><button type="button" class="dropdown-item fw-bold" hx-get="#">To Invoice</button></li>
+                                          <li><button type="button" class="dropdown-item fw-bold" onclick="window.location.href=`{% url 'convertChallanToInvoice' i.challan.id %}`">To Invoice</button></li>
                                           <!-- <li><button type="button" class="dropdown-item fw-bold" hx-get="#">To Sales Order</button></li> -->
                                         </ul>
                                     </div>
+                                    {% endif %}
+                                    
                                 </td>
                                 <td class="p-0 pt-1 m-0">
                                     <div class="btn-group mb-1">

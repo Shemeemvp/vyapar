@@ -206,6 +206,12 @@ urlpatterns = [
     path('download_challan_sample_file',views.downloadChallanSampleImportFile, name = 'downloadChallanSampleImportFile'),
     path('challan_bill_pdf_view/<int:id>',views.challanBillPdf, name='challanBillPdf'),
     path('view_challan_bill/<int:id>',views.viewChallan, name='viewChallan'),
+    path('convert_estimate_to_sales_order/<int:id>',views.convertEstimateToSalesOrder, name='convertEstimateToSalesOrder'),
+    path('save_estimate_to_sales_order/<int:id>',views.saveEstimateToSalesOrder, name='saveEstimateToSalesOrder'),
+    path('convert_estimate_to_invoice/<int:id>',views.convertEstimateToInvoice, name='convertEstimateToInvoice'),
+    path('save_estimate_to_invoice/<int:id>',views.saveEstimateToInvoice, name='saveEstimateToInvoice'),
+    path('convert_challan_to_invoice/<int:id>',views.convertChallanToInvoice, name='convertChallanToInvoice'),
+    path('save_challan_to_invoice/<int:id>',views.saveChallanToInvoice, name='saveChallanToInvoice'),
     # ===================================== shemeem - end ==================================================
     
     #______________Sales Invoice_________________Antony Tom___________________________

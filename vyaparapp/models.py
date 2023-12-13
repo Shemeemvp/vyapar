@@ -227,8 +227,60 @@ class PurchaseBillTransactionHistory(models.Model):
     transactiondate = models.DateField(auto_now=True)
 
 
+
+# _____________________SalesInvoice_______________Antony Tom____________
+
+class SalesInvoice(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True,blank=True)
+    company = models.ForeignKey(company, on_delete=models.CASCADE,null=True,blank=True)
+    staff = models.ForeignKey(staff_details, on_delete=models.CASCADE,null=True,blank=True)
+    party = models.ForeignKey(party, on_delete=models.CASCADE,null=True,blank=True)
+    party_name = models.CharField(max_length=100,null=True,blank=True)
+    contact = models.CharField(max_length=255,null=True,blank=True)
+    address = models.CharField(max_length=255,null=True,blank=True)
+    invoice_no = models.IntegerField(default=0,null=True,blank=True)
+    date = models.DateField()
+    state_of_supply = models.CharField(max_length=255,null=True,blank=True)
+    paymenttype = models.CharField(max_length=255,null=True,blank=True)
+    cheque = models.CharField(max_length=255,null=True,blank=True)
+    upi = models.CharField(max_length=255,null=True,blank=True)
+    accountno = models.CharField(max_length=255,null=True,blank=True)
+    description = models.TextField(max_length=255,null=True,blank=True)
+    subtotal = models.IntegerField(default=0, null=True)
+    igst = models.CharField(max_length=100,default=0, null=True)
+    cgst = models.CharField(max_length=100,default=0, null=True)
+    sgst = models.CharField(max_length=100,default=0, null=True)
+    total_taxamount = models.CharField(max_length=100,default=0)
+    adjustment = models.CharField(max_length=100,default=0)
+    grandtotal = models.FloatField(default=0, null=True)
+    paidoff = models.CharField(null=True,blank=True,max_length=255)
+    totalbalance = models.CharField(null=True,blank=True,max_length=255)
+
+
+class SalesInvoiceItem(models.Model):
+    company = models.ForeignKey(company, on_delete=models.CASCADE,null=True,blank=True)
+    staff = models.ForeignKey(staff_details, on_delete=models.CASCADE,null=True,blank=True)
+    salesinvoice = models.ForeignKey(SalesInvoice, on_delete=models.CASCADE,null=True,blank=True)
+    item = models.ForeignKey(ItemModel, on_delete=models.CASCADE,null=True,blank=True)
+    hsn = models.IntegerField(default=0,null=True,blank=True)
+    quantity = models.IntegerField(default=0,null=True,blank=True)
+    rate = models.DecimalField(max_digits=10, decimal_places=2, default=0.00,null=True,blank=True)
+    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00,null=True,blank=True)
+    tax =  models.CharField(max_length=255,null=True,blank=True)
+    totalamount = models.DecimalField(max_digits=20, decimal_places=2, default=0.00,null=True,blank=True)
+
+
+class SalesInvoiceTransactionHistory(models.Model):
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
+    company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
+    salesinvoice = models.ForeignKey(SalesInvoice,on_delete=models.CASCADE,blank=True,null=True)
+    date = models.DateField(auto_now_add=True,null=True)
+    action = models.CharField(max_length=255)
+    done_by_name = models.CharField(max_length=255)
     
-    
+#End
+
+
 # ==============delivery challan & Estimate ============shemeem --start=======
 
 class Estimate(models.Model):
@@ -288,6 +340,7 @@ class DeliveryChallan(models.Model):
     staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
+    invoice = models.ForeignKey(SalesInvoice, on_delete=models.CASCADE,null=True)
     challan_no = models.CharField(max_length=20, null=True)
     date = models.DateField(null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
@@ -339,58 +392,6 @@ class DeliveryChallanTransactionHistory(models.Model):
 
     
 # ==================================shemeem --end =======================================
-
-# _____________________SalesInvoice_______________Antony Tom____________
-
-class SalesInvoice(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True,blank=True)
-    company = models.ForeignKey(company, on_delete=models.CASCADE,null=True,blank=True)
-    staff = models.ForeignKey(staff_details, on_delete=models.CASCADE,null=True,blank=True)
-    party = models.ForeignKey(party, on_delete=models.CASCADE,null=True,blank=True)
-    party_name = models.CharField(max_length=100,null=True,blank=True)
-    contact = models.CharField(max_length=255,null=True,blank=True)
-    address = models.CharField(max_length=255,null=True,blank=True)
-    invoice_no = models.IntegerField(default=0,null=True,blank=True)
-    date = models.DateField()
-    state_of_supply = models.CharField(max_length=255,null=True,blank=True)
-    paymenttype = models.CharField(max_length=255,null=True,blank=True)
-    cheque = models.CharField(max_length=255,null=True,blank=True)
-    upi = models.CharField(max_length=255,null=True,blank=True)
-    accountno = models.CharField(max_length=255,null=True,blank=True)
-    description = models.TextField(max_length=255,null=True,blank=True)
-    subtotal = models.IntegerField(default=0, null=True)
-    igst = models.CharField(max_length=100,default=0, null=True)
-    cgst = models.CharField(max_length=100,default=0, null=True)
-    sgst = models.CharField(max_length=100,default=0, null=True)
-    total_taxamount = models.CharField(max_length=100,default=0)
-    adjustment = models.CharField(max_length=100,default=0)
-    grandtotal = models.FloatField(default=0, null=True)
-    paidoff = models.CharField(null=True,blank=True,max_length=255)
-    totalbalance = models.CharField(null=True,blank=True,max_length=255)
-
-
-class SalesInvoiceItem(models.Model):
-    company = models.ForeignKey(company, on_delete=models.CASCADE,null=True,blank=True)
-    staff = models.ForeignKey(staff_details, on_delete=models.CASCADE,null=True,blank=True)
-    salesinvoice = models.ForeignKey(SalesInvoice, on_delete=models.CASCADE,null=True,blank=True)
-    item = models.ForeignKey(ItemModel, on_delete=models.CASCADE,null=True,blank=True)
-    hsn = models.IntegerField(default=0,null=True,blank=True)
-    quantity = models.IntegerField(default=0,null=True,blank=True)
-    rate = models.DecimalField(max_digits=10, decimal_places=2, default=0.00,null=True,blank=True)
-    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00,null=True,blank=True)
-    tax =  models.CharField(max_length=255,null=True,blank=True)
-    totalamount = models.DecimalField(max_digits=20, decimal_places=2, default=0.00,null=True,blank=True)
-
-
-class SalesInvoiceTransactionHistory(models.Model):
-    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
-    company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
-    salesinvoice = models.ForeignKey(SalesInvoice,on_delete=models.CASCADE,blank=True,null=True)
-    date = models.DateField(auto_now_add=True,null=True)
-    action = models.CharField(max_length=255)
-    done_by_name = models.CharField(max_length=255)
-    
-#End
 
 # ========================= HARIPRIYA B NAIR (START)===========================
 class purchasedebit(models.Model):
