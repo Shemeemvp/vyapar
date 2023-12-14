@@ -344,7 +344,12 @@
                                 <td>{{i.history.staff.first_name| capfirst}}</td>
                                 <td class="p-0 pt-1 m-0">
                                     {% if i.estimate.is_converted %}
-                                    <span class="px-2 py-2 bg-success rounded-1 text-white">Converted</span>
+                                    {% if i.estimate.invoice != None %}
+                                    <span class="text-info fw-bolder text-center" onclick="window.location.href='/salesinvoice_billtemplate/{{i.estimate.invoice.id}}'">Converted to Invoice - {{i.estimate.invoice.invoice_no}}</span>
+                                    {% else %}
+                                    <span class="text-info fw-bolder text-center" onclick="window.location.href='/saleorder_view/{{i.estimate.sales_order.id}}'">Converted to Sales Order - {{i.estimate.sales_order.orderno}}</span>
+                                    {% endif %}
+                                    <!-- <span class="px-2 py-2 bg-success rounded-1 text-white">Converted</span> -->
                                     {% else %}
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

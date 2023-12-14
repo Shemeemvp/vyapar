@@ -6,7 +6,10 @@
 <script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.full.min.js"></script>
 <style>
-    ::-webkit-scrollbar{
+    /* ::-webkit-scrollbar{
+        display: none
+    } */
+    #delivery_challan_table_segment::-webkit-scrollbar{
         display: none
     }
     .bs{
@@ -209,7 +212,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-3" style="overflow: scroll;height: 31rem;">
+            <div class="mt-3" style="overflow: scroll;height: 31rem;" id="delivery_challan_table_segment">
                     <table id="delivery_challan_table" class="table table-bordered table-info table-striped tb table-responsive w-100">
                         <thead>
                             <th class="text-center align-middle">#</th>

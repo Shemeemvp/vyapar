@@ -33,6 +33,8 @@ from django.db import transaction
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from vyaparapp.models import company
+from openpyxl import load_workbook, Workbook
 
 # Create your views here.
 def home(request):
@@ -2152,19 +2154,15 @@ def create_purchasebill(request):
     product = tuple(request.POST.getlist("product[]"))
     qty =  tuple(request.POST.getlist("qty[]"))
     discount =  tuple(request.POST.getlist("discount[]"))
-    if request.POST.get('placosupply') =='State':
-      tax =  tuple(request.POST.getlist("tax1[]"))
-    else:
-      tax =  tuple(request.POST.getlist("tax2[]"))
     total =  tuple(request.POST.getlist("total[]"))
     billno = PurchaseBill.objects.get(billno =pbill.billno,company=cmp)
 
-    if len(product)==len(qty)==len(tax)==len(discount)==len(total):
-        mapped=zip(product,qty,tax,discount,total)
+    if len(product)==len(qty)==len(discount)==len(total):
+        mapped=zip(product,qty,discount,total)
         mapped=list(mapped)
         for ele in mapped:
           itm = ItemModel.objects.get(id=ele[0])
-          PurchaseBillItem.objects.create(product = itm,qty=ele[1], tax=ele[2],discount=ele[3],total=ele[4],purchasebill=billno,company=cmp)
+          PurchaseBillItem.objects.create(product = itm,qty=ele[1],discount=ele[2],total=ele[3],purchasebill=billno,company=cmp)
 
     PurchaseBill.objects.filter(company=cmp).update(tot_bill_no=F('tot_bill_no') + 1)
     
@@ -2180,7 +2178,7 @@ def create_purchasebill(request):
       return redirect('view_purchasebill')
     
   else:
-    return render(request,'staff/purchasebilladd.html')
+    return render(request,'company/purchasebilladd.html')
 
 
 def edit_purchasebill(request,id):
@@ -2236,20 +2234,16 @@ def update_purchasebill(request,id):
 
     product = tuple(request.POST.getlist("product[]"))
     qty = tuple(request.POST.getlist("qty[]"))
-    if request.POST.get('placosupply') == 'State':
-      tax =tuple( request.POST.getlist("tax1[]"))
-    else:
-      tax = tuple(request.POST.getlist("tax2[]"))
     total = tuple(request.POST.getlist("total[]"))
     discount = tuple(request.POST.getlist("discount[]"))
 
     PurchaseBillItem.objects.filter(purchasebill=pbill,company=cmp).delete()
-    if len(total)==len(discount)==len(qty)==len(tax):
-      mapped=zip(product,qty,tax,discount,total)
+    if len(total)==len(discount)==len(qty):
+      mapped=zip(product,qty,discount,total)
       mapped=list(mapped)
       for ele in mapped:
         itm = ItemModel.objects.get(id=ele[0])
-        PurchaseBillItem.objects.create(product =itm,qty=ele[1], tax=ele[2],discount=ele[3],total=ele[4],purchasebill=pbill,company=cmp)
+        PurchaseBillItem.objects.create(product =itm,qty=ele[1],discount=ele[2],total=ele[3],purchasebill=pbill,company=cmp)
 
     PurchaseBillTransactionHistory.objects.create(purchasebill=pbill,company=cmp,staff=staff,action='Updated')
     return redirect('view_purchasebill')
@@ -2340,37 +2334,39 @@ def import_purchase_bill(request):
       for row_number2 in range(2, ep.max_row + 1):
         prdsheet = [ep.cell(row=row_number2, column=col_num).value for col_num in range(1, ep.max_column + 1)]
         if prdsheet[0] == row_number1:
-          itm = ItemModel.objects.get(item_name=prdsheet[1],item_hsn=prdsheet[2])
-          total=int(prdsheet[3])*int(itm.item_purchase_price) - int(prdsheet[5])
+          itm = ItemModel.objects.get(item_name=prdsheet[1],item_hsn=int(prdsheet[2]),company=cmp)
+          total=int(prdsheet[3])*int(itm.item_purchase_price) - int(prdsheet[4])
           PurchaseBillItem.objects.create(purchasebill=pbill,
                                 company=cmp,
                                 product=itm,
                                 qty=prdsheet[3],
-                                tax=prdsheet[4],
-                                discount=prdsheet[5],
+                                discount=prdsheet[4],
                                 total=total)
 
-          temp = prdsheet[4].split('[')
           if billsheet[3] =='State':
-            tax=int(temp[0][3:])
+            taxval = itm.item_gst
+            taxval=taxval.split('[')
+            tax=int(taxval[0][3:])
           else:
-            tax=int(temp[0][4:])
+            taxval = itm.item_igst
+            taxval=taxval.split('[')
+            tax=int(taxval[0][4:])
 
           subtotal += total
           tamount = total *(tax / 100)
           taxamount += tamount
                 
-      if billsheet[3]=='State':
-        gst = round((taxamount/2),2)
-        pbill.sgst=gst
-        pbill.cgst=gst
-        pbill.igst=0
+          if billsheet[3]=='State':
+            gst = round((taxamount/2),2)
+            pbill.sgst=gst
+            pbill.cgst=gst
+            pbill.igst=0
 
-      else:
-        gst=round(taxamount,2)
-        pbill.igst=gst
-        pbill.cgst=0
-        pbill.sgst=0
+          else:
+            gst=round(taxamount,2)
+            pbill.igst=gst
+            pbill.cgst=0
+            pbill.sgst=0
 
       gtotal = subtotal + taxamount + float(billsheet[6])
       balance = gtotal- float(billsheet[7])
@@ -2491,12 +2487,14 @@ def item_dropdown(request):
   sid = request.session.get('staff_id')
   staff =  staff_details.objects.get(id=sid)
   cmp = company.objects.get(id=staff.company.id)
+  product = ItemModel.objects.filter(company=cmp,user=cmp.user)
 
-  options = {}
-  option_objects = ItemModel.objects.filter(company=cmp,user=cmp.user)
-  for option in option_objects:
-      options[option.id] = [option.item_name]
-  return JsonResponse(options)
+  id_list = []
+  product_list = []
+  for p in product:
+    id_list.append(p.id)
+    product_list.append(p.item_name)
+  return JsonResponse({'id_list':id_list, 'product_list':product_list})
 
 
 def custdata(request):
@@ -5885,16 +5883,44 @@ def distributor_module_updation_ok(request,mid):
   return redirect('distributor_notification')
 
 def expense(request):
+
   staff_id = request.session['staff_id']
-  staff =  staff_details.objects.get(id=staff_id)
+  staff = staff_details.objects.get(id=staff_id)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
-  expenses=Expense.objects.filter(staff_id__company=staff.company).order_by('-id')
-  print(expenses)
-  first=Expense.objects.filter(staff_id__company=staff.company)[:1]
+  
+  expenses = Expense.objects.filter(staff_id__company=staff.company).order_by('-id')
+  allcat = Expense_Category.objects.filter(staff__company=staff.company).order_by('-id')
+
+
+  category_totals = defaultdict(float)
+  category_balances = defaultdict(float)
+
+
+  for expense in expenses:
+    category_totals[expense.expense_category_id.id] += expense.total
+    category_balances[expense.expense_category_id.id] += expense.balance
+
+  for category in allcat:
+    category.grant = category_totals.get(category.id, 0)
+    category.balance = category_balances.get(category.id, 0)
+    category.save() 
+
+
+
+  first=allcat[:1]
+  print(first)
+  
+ 
+  ex = Expense.objects.filter(staff_id__company=staff.company)
+
+
   context={'staff':staff,
            'allmodules':allmodules,
            'expenses':expenses,
-           'first':first}
+           'first':first,
+           'allcat':allcat,
+           'ex':ex
+           }
   return render(request,'company/expense.html',context)
 
 def newexpenses(request):
@@ -6060,7 +6086,7 @@ def create_expense(request):
               amount=ele[2] 
           )
 
-        return redirect('expense')
+        
     else:
       if len(dis) == len(amount):
         mapped = zip(dis, amount)
@@ -6075,26 +6101,70 @@ def create_expense(request):
               amount=ele[1] 
           )
           
+    current_datetime = timezone.now()
+    date =  current_datetime.date()
+    ExpenseHistory.objects.create(
+      staff=staff,
+      expense=data,
+      date=date,
+      action = "Create",
 
-        return redirect('expense')
-
+    )    
+    return redirect('expense')
 
   return redirect('add_party_in_expense')
 
 
 def view_expense(request,eid):
-  sid = request.session.get('staff_id')
-  staff =  staff_details.objects.get(id=sid)
+  
+  staff_id = request.session['staff_id']
+  staff = staff_details.objects.get(id=staff_id)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
-  first=Expense.objects.filter(id=eid)
-  expenses=Expense.objects.filter(staff_id__company=staff.company).order_by('-id')
-  context={
-    'staff':staff,
-    'allmodules':allmodules,
-    'expenses':expenses,
-    'first':first
+  
+  expenses = Expense.objects.filter(staff_id__company=staff.company).order_by('-id')
+  allcat = Expense_Category.objects.filter(staff__company=staff.company).order_by('-id')
+  
 
-  }
+
+  category_totals = defaultdict(float)
+  category_balances = defaultdict(float)
+
+
+  for expense in expenses:
+    category_totals[expense.expense_category_id.id] += expense.total
+    category_balances[expense.expense_category_id.id] += expense.balance
+
+  for category in allcat:
+    
+      category.grant = category_totals.get(category.id, 0)
+      category.balance = category_balances.get(category.id, 0)
+      category.save()
+
+
+  first= Expense_Category.objects.filter(id=eid)
+  for f in first:
+    
+      f.grant = category_totals.get(f.id, 0)
+      f.balance = category_balances.get(f.id, 0)
+      f.save()
+      print(f)
+ 
+
+
+  
+  
+ 
+  ex = Expense.objects.filter(staff_id__company=staff.company)
+
+
+  context={'staff':staff,
+           'allmodules':allmodules,
+           'expenses':expenses,
+           'first':first,
+           'allcat':allcat,
+           'ex':ex,
+           
+           }
   return render(request,'company/expense.html',context)
 
 def expense_details(request,eid):
@@ -7349,6 +7419,7 @@ def view_paymentout(request):
     
     # Assuming you want to display the latest PaymentOut records
     paymentouts = PaymentOut.objects.filter(company=cmp).order_by('-billdate')
+    
 
     if not paymentouts:
         context = {'staff': staff, 'allmodules': allmodules}
@@ -7376,8 +7447,11 @@ def add_paymentout(request):
     else:
         # Handle the case where there's no last_bill
         bill_no = 1
-
-    context = {'staff': staff, 'allmodules': allmodules, 'cust': cust, 'cmp': cmp, 'bill_no': bill_no, 'tod': tod, 'bank': bank}
+    # Include the last_paymentout in the context
+    last_paymentout = PaymentOut.objects.filter(company=cmp).last()
+    # Debug code to print the ref_no
+    print("Last PaymentOut Ref No:", last_paymentout.ref_no)
+    context = {'staff': staff, 'allmodules': allmodules, 'cust': cust, 'cmp': cmp, 'bill_no': bill_no, 'tod': tod, 'bank': bank,'last_paymentout': last_paymentout}
     return render(request, 'company/paymentoutadd.html', context)
 
 def create_paymentout(request):
@@ -7386,12 +7460,17 @@ def create_paymentout(request):
         staff = staff_details.objects.get(id=sid)
         cmp = company.objects.get(id=staff.company.id)
         part = party.objects.get(id=request.POST.get('customername'))
+        # Find the maximum ref_no in the database
+        max_ref_no = PaymentOut.objects.filter(company=cmp).aggregate(Max('ref_no'))['ref_no__max']
+
+        # Use the maximum ref_no + 1 or set to 1 if there are no existing records
+        bill_no = max_ref_no + 1 if max_ref_no is not None else 1
 
         pbill = PaymentOut(
             staff=staff,
             company=cmp,
             party=part,
-            billno=part.id,
+            ref_no=bill_no,
             billdate=request.POST.get('billdate'),
             pay_method=request.POST.get("method"),
             cheque_no=request.POST.get("cheque_id"),
@@ -7400,19 +7479,18 @@ def create_paymentout(request):
         )
         pbill.save()
 
-        # Create PaymentOutDetails
+          # Create PaymentOutDetails
         paid = request.POST.get('paid')
         description = request.POST.get('description')
         files = request.FILES.get('files')
 
         paymentout_details = PaymentOutDetails(
-            paymentout=pbill,
+            paymentout=pbill,  # Set the foreign key relationship
             paid=paid,
             description=description,
             files=files
         )
         paymentout_details.save()
-
       # Record history for creation
         PaymentOutHistory.objects.create(paymentout=pbill, action='created')  
         
@@ -7428,9 +7506,15 @@ def delete_paymentout(request):
     if request.method == 'POST':
         paymentOutId = request.POST.get('paymentOutId')
         try:
-            # Perform the deletion, e.g., using the Django ORM
-            payment_out = get_object_or_404(PaymentOut, id=paymentOutId)
-            payment_out.delete()
+            with transaction.atomic():
+                # Perform the deletion, e.g., using the Django ORM
+                payment_out = get_object_or_404(PaymentOut, id=paymentOutId)
+                ref_no = payment_out.ref_no
+                payment_out.delete()
+
+                # Update the ref_no of subsequent records sequentially
+                PaymentOut.objects.filter(ref_no__gt=ref_no).update(ref_no=models.F('ref_no') - 1)
+
             return JsonResponse({'success': True})
         except PaymentOut.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Payment Out not found'})
@@ -7490,6 +7574,12 @@ def edit_paymentout(request, id):
 
     # Use get_object_or_404 to retrieve the PaymentOut object or return a 404 response if not found
     paymentout = get_object_or_404(PaymentOut, id=id, company=cmp)
+    
+    # Fetch related PaymentOutDetails and enumerate them
+    # Fetch related PaymentOutDetails and enumerate them
+    paymentout_details = paymentout.paymentout_details()
+
+
 
     billdate = paymentout.billdate
     pay_method = paymentout.pay_method
@@ -7507,8 +7597,9 @@ def edit_paymentout(request, id):
         'paymentout': paymentout,
         'billdate': billdate,
         'pay_method': pay_method,
+        'paymentout_details': paymentout_details,  # Pass the details to the context
     }
-    return render(request, 'company/paymentoutedit.html', context)    
+    return render(request, 'company/paymentoutedit.html', context)
 
 def update_paymentout(request, id):
     if request.method == 'POST':
@@ -7522,6 +7613,7 @@ def update_paymentout(request, id):
         paymentout.pay_method = request.POST.get('method')
         paymentout.cheque_no = request.POST.get('cheque_id')
         paymentout.upi_no = request.POST.get('upi_id')
+        paymentout.balance = request.POST.get('balance')
 
         # Add more fields as needed...
         
@@ -7533,11 +7625,15 @@ def update_paymentout(request, id):
             paymentout.paymentoutdetails_set.all().delete()  # Delete existing details
 
             # Iterate through form data to create new details
+        
+            
+            # Iterate through form data to create new details
             for i in range(int(request.POST.get('total_items', 0))):
                 paid = request.POST.get(f'paid_{i}')
                 description = request.POST.get(f'description_{i}')
                 # Handle file upload if needed
                 file = request.FILES.get(f'file_{i}')
+                print(f'Index: {i}, Paid: {paid}, Description: {description}, File: {file}')
 
                 # Create new PaymentOutDetails
                 PaymentOutDetails.objects.create(
@@ -7560,6 +7656,29 @@ def update_paymentout(request, id):
 def paymentout_history(request, id):
     paymentout_history = PaymentOutHistory.objects.filter(paymentout_id=id).order_by('-timestamp')
     return render(request, 'company/paymentout_history.html', {'paymentout_history': paymentout_history})
+
+@csrf_exempt  # For demonstration purposes, you might want to remove this in production and handle CSRF properly
+def send_email(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+            email_ids = data.get('emailIds', '')
+            email_message = data.get('emailMessage', '')
+
+            # Your email sending logic here
+            send_mail(
+                'Subject',  # Replace with your subject
+                email_message,  # Replace with your email message
+                'your_email@example.com',  # Replace with your sender email
+                [email_ids],  # Replace with your recipient email(s)
+                fail_silently=False,
+            )
+
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method'})
 #End
 
 #Akshaya
@@ -7603,7 +7722,7 @@ def sharegstr3BToEmail(request):
             from_email='altostechnologies6@gmail.com',
             to=emails_list,  # Use the recipient_email variable here
             )
-        message.attach('file.pdf', pdf_content.read(), 'application/pdf')
+        message.attach(filename, pdf_content.read(), 'application/pdf')
         
         try:
             message.send()
@@ -7630,7 +7749,6 @@ def gstr9(request):
 
 def sharegstr9ToEmail(request):
     if request.method == "POST":
-        
 
         sid = request.session.get('staff_id')
         staff =  staff_details.objects.get(id=sid)
@@ -7651,14 +7769,14 @@ def sharegstr9ToEmail(request):
         pisa_document = pisa.CreatePDF(html_message.encode("UTF-8"), pdf_content) 
         pdf_content.seek(0)
         # todo: need to update the from_email
-        filename = f'gstr3B {staff.company.company_name}.pdf'
+        filename = f'gstr9 {staff.company.company_name}.pdf'
         message = EmailMultiAlternatives(
             subject=my_subject,
             body= f"Hi,\nPlease find the attached Gstr9 Report -  \n{email_message}\n--\nRegards,\n{staff.company.company_name}\n{staff.company.address}\n{staff.company.state} - {staff.company.country}\n{staff.company.contact}",
             from_email='altostechnologies6@gmail.com',
             to= emails_list ,  # Use the recipient_email variable here
             )
-        message.attach('file.pdf', pdf_content.read(), 'application/pdf')
+        message.attach(filename, pdf_content.read(), 'application/pdf')
         
         try:
             message.send()
@@ -7904,6 +8022,7 @@ def editPaymentIn(request, id):
       return redirect(viewPaymentIn,id)
 
 
+
 def updatePaymentIn(request,id):
   if 'staff_id' in request.session:
     if request.session.has_key('staff_id'):
@@ -8091,8 +8210,109 @@ def importPaymentFromExcel(request):
     if incorrect_data:
       messages.warning(request, f'Data with following Sl No could not import due to incorrect data provided - {", ".join(str(item) for item in incorrect_data)}')
     return redirect(paymentIn)
+    
+#End
+
+def gstrr2(request):
+    comp = company.objects.get(user_id=request.user.id)
+    purchasebill =  PurchaseBill.objects.all()
+    partydata = party.objects.all()   
+    return render(request, 'company/gstr_2.html' , {'purchasebill':purchasebill,'company':comp,'partydata':partydata})  
+
+def gstrnew1(request):
+    comp = company.objects.get(user_id=request.user.id)
+    return render(request, 'company/gstr_1.html',{'company':comp})  
+       
+
+def sharepurchaseBillToEmail(request):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    comp =  company.objects.get(id = staff.company.id)
+    try:
+      if request.method == 'POST':
+        emails_string = request.POST['email_ids']
+
+        # Split the string by commas and remove any leading or trailing whitespace
+        emails_list = [email.strip() for email in emails_string.split(',')]
+        email_message = request.POST['email_message']
+        # print(emails_list)
+
+        # comp = company.objects.get(user_id=request.user.id)
+        purchasebill =  PurchaseBill.objects.all()
+        partydata = party.objects.all()
+        allmodules= modules_list.objects.get(company=staff.company,status='New')
+        context = {'purchasebill': purchasebill,'partydata': partydata,'allmodules': allmodules, 'company': comp}
 
 
+        template_path = 'company/gstr1_pdf.html'
+        template = get_template(template_path)
+
+        html  = template.render(context)
+        result = BytesIO()
+        pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+        pdf = result.getvalue()
+        filename = f'Purchase Bill - {comp.company_name}.pdf'
+        subject = f"Purchase Bill Receipt - {comp.company_name}"
+        email = EmailMessage(subject, f"Hi,\nPlease find the attached Receipt of Purchase Bill -{comp.company_name}. \n{email_message}\n\n--\nRegards,\n{comp.company_name}\n{comp.address}\n{comp.city} - {comp.state}\n{comp.contact}", from_email=settings.EMAIL_HOST_USER, to=emails_list)
+        email.attach(filename, pdf, "application/pdf")
+        email.send(fail_silently=False)
+
+        messages.success(request, 'Purchase Bill has been shared via email successfully..!')
+        return redirect(gstrnew1)
+    except Exception as e:
+        print(e)
+        messages.error(request, f'{e}')
+        return redirect(gstrnew1)  
+    
+def shareGSTR2purchaseBillToEmail(request):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    comp =  company.objects.get(id = staff.company.id)
+    try:
+      if request.method == 'POST':
+        emails_string = request.POST['email_ids']
+
+        # Split the string by commas and remove any leading or trailing whitespace
+        emails_list = [email.strip() for email in emails_string.split(',')]
+        email_message = request.POST['email_message']
+        # print(emails_list)
+
+        # comp = company.objects.get(user_id=request.user.id)
+        purchasebill =  PurchaseBill.objects.all()
+        partydata = party.objects.all()
+        allmodules= modules_list.objects.get(company=staff.company,status='New')
+        context = {'purchasebill': purchasebill,'partydata': partydata,'allmodules': allmodules, 'company': comp}
+
+
+        template_path = 'company/gstr2_pdf.html'
+        template = get_template(template_path)
+
+        html  = template.render(context)
+        result = BytesIO()
+        pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+        pdf = result.getvalue()
+        filename = f'Purchase Bill - {comp.company_name}.pdf'
+        subject = f"Purchase Bill Receipt - {comp.company_name}"
+        email = EmailMessage(subject, f"Hi,\nPlease find the attached Receipt of Purchase Bill -{comp.company_name}. \n{email_message}\n\n--\nRegards,\n{comp.company_name}\n{comp.address}\n{comp.city} - {comp.state}\n{comp.contact}", from_email=settings.EMAIL_HOST_USER, to=emails_list)
+        email.attach(filename, pdf, "application/pdf")
+        email.send(fail_silently=False)
+
+        messages.success(request, 'Purchase Bill has been shared via email successfully..!')
+        return redirect(gstrr2)
+    except Exception as e:
+        print(e)
+        messages.error(request, f'{e}')
+        return redirect(gstrr2)  
+        
+        
 def convertEstimateToSalesOrder(request,id):
   if 'staff_id' in request.session:
     if request.session.has_key('staff_id'):
@@ -8357,7 +8577,7 @@ def convertChallanToInvoice(request,id):
     context={
       'staff':staff,'Party':Party,'item':item,'bank':bank,'count':next_count,'allmodules':allmodules,'challan':challan, 'ch_items':ch_items,
     }
-    return render(request, 'company/challan_to_invoice1.html',context)
+    return render(request, 'company/challan_to_invoice.html',context)
 
 
 def saveChallanToInvoice(request,id):
@@ -8456,6 +8676,3 @@ def saveChallanToInvoice(request,id):
       challan.save()
 
       return redirect(delivery_challan)
-
-    
-#End

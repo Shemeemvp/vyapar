@@ -279,7 +279,69 @@ class SalesInvoiceTransactionHistory(models.Model):
     done_by_name = models.CharField(max_length=255)
     
 #End
+# ========================= nasneen o m ===========================
 
+class salesorder(models.Model):
+
+    partyname = models.CharField(max_length=100,null=True)
+    staff = models.ForeignKey(staff_details, on_delete=models.CASCADE,null=True,blank=True)
+    comp = models.ForeignKey(company, on_delete=models.CASCADE,null=True,blank=True)
+    orderno = models.IntegerField(null=True)
+    orderdate = models.DateField(null=True)
+    duedate = models.DateField(null=True)
+    
+    placeofsupply = models.CharField(max_length=100,null=True)
+    payment_method = models.CharField(max_length=100, default='cash')
+    UPI = models.CharField(max_length=100,null=True)
+    checkno = models.CharField(max_length=100,null=True)
+    accno = models.CharField(max_length=100,null=True)
+    subtotal = models.CharField(max_length=100,null=True)
+    IGST = models.CharField(max_length=100,null=True)
+    CGST  =  models.CharField(max_length=100,null=True)
+    SGST =  models.CharField(max_length=100,null=True)
+    taxamount = models.CharField(max_length=100,null=True)
+    adjustment = models.CharField(max_length=100,null=True)
+    grandtotal = models.CharField(max_length=100,null=True)
+
+    note = models.TextField(null=True)
+    
+    paid = models.CharField(max_length=100,null=True)
+    balance = models.CharField(max_length=100,null=True)
+    
+    file = models.FileField(upload_to='sales',null=True)
+    status = models.CharField(max_length=100,default='open')
+    action = models.CharField(max_length=100,default='convert to invoice')
+
+    @classmethod
+    def next_orderno(cls):
+        last_orderno = cls.objects.aggregate(Max('orderno'))['orderno__max']
+        return 111111 if last_orderno is None else last_orderno + 1
+    
+    
+    
+class sales_item(models.Model):
+    sale_order= models.ForeignKey(salesorder,on_delete=models.CASCADE,null=True)
+    cmp = models.ForeignKey(company, on_delete=models.CASCADE,default='')
+    # product1 = models.CharField(max_length=100,null=True)
+    product= models.ForeignKey(ItemModel,on_delete=models.CASCADE,null=True)
+
+    hsn = models.CharField(max_length=100,null=True)
+    # description = models.CharField(max_length=100, default='')
+    qty = models.IntegerField(default=0, null=True)
+    price = models.CharField(max_length=100,null=True)
+    total = models.IntegerField(default=0, null=True)
+    discount = models.CharField(max_length=100,null=True)
+    tax = models.CharField(max_length=100,null=True)
+    
+
+class saleorder_transaction(models.Model):
+    sales_order = models.ForeignKey(salesorder,on_delete=models.CASCADE,blank=True,null=True)
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
+    company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
+    action = models.CharField(max_length=255,null=True)
+    date = models.DateField(null=True)
+    
+#End
 
 # ==============delivery challan & Estimate ============shemeem --start=======
 
@@ -287,6 +349,8 @@ class Estimate(models.Model):
     staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
+    invoice = models.ForeignKey(SalesInvoice, on_delete=models.CASCADE,null=True)
+    sales_order = models.ForeignKey(salesorder, on_delete=models.CASCADE,null=True)
     ref_no = models.CharField(max_length=20, null=True)
     date = models.DateField(null=True, blank=True)
     party_name = models.CharField(max_length=150)
@@ -523,69 +587,7 @@ class PurchaseOrderTransactionHistory(models.Model):
     transactiondate = models.DateField(auto_now=True)
     
     
-# ========================= nasneen o m ===========================
 
-class salesorder(models.Model):
-
-    partyname = models.CharField(max_length=100,null=True)
-    staff = models.ForeignKey(staff_details, on_delete=models.CASCADE,null=True,blank=True)
-    comp = models.ForeignKey(company, on_delete=models.CASCADE,null=True,blank=True)
-    orderno = models.IntegerField(null=True)
-    orderdate = models.DateField(null=True)
-    duedate = models.DateField(null=True)
-    
-    placeofsupply = models.CharField(max_length=100,null=True)
-    payment_method = models.CharField(max_length=100, default='cash')
-    UPI = models.CharField(max_length=100,null=True)
-    checkno = models.CharField(max_length=100,null=True)
-    accno = models.CharField(max_length=100,null=True)
-    subtotal = models.CharField(max_length=100,null=True)
-    IGST = models.CharField(max_length=100,null=True)
-    CGST  =  models.CharField(max_length=100,null=True)
-    SGST =  models.CharField(max_length=100,null=True)
-    taxamount = models.CharField(max_length=100,null=True)
-    adjustment = models.CharField(max_length=100,null=True)
-    grandtotal = models.CharField(max_length=100,null=True)
-
-    note = models.TextField(null=True)
-    
-    paid = models.CharField(max_length=100,null=True)
-    balance = models.CharField(max_length=100,null=True)
-    
-    file = models.FileField(upload_to='sales',null=True)
-    status = models.CharField(max_length=100,default='open')
-    action = models.CharField(max_length=100,default='convert to invoice')
-
-    @classmethod
-    def next_orderno(cls):
-        last_orderno = cls.objects.aggregate(Max('orderno'))['orderno__max']
-        return 111111 if last_orderno is None else last_orderno + 1
-    
-    
-    
-class sales_item(models.Model):
-    sale_order= models.ForeignKey(salesorder,on_delete=models.CASCADE,null=True)
-    cmp = models.ForeignKey(company, on_delete=models.CASCADE,default='')
-    # product1 = models.CharField(max_length=100,null=True)
-    product= models.ForeignKey(ItemModel,on_delete=models.CASCADE,null=True)
-
-    hsn = models.CharField(max_length=100,null=True)
-    # description = models.CharField(max_length=100, default='')
-    qty = models.IntegerField(default=0, null=True)
-    price = models.CharField(max_length=100,null=True)
-    total = models.IntegerField(default=0, null=True)
-    discount = models.CharField(max_length=100,null=True)
-    tax = models.CharField(max_length=100,null=True)
-    
-
-class saleorder_transaction(models.Model):
-    sales_order = models.ForeignKey(salesorder,on_delete=models.CASCADE,blank=True,null=True)
-    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
-    company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
-    action = models.CharField(max_length=255,null=True)
-    date = models.DateField(null=True)
-    
-#End
 
 # ==============Anuvinda K V ============payment out=======
 class PaymentOut(models.Model):
